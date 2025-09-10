@@ -1,7 +1,7 @@
 # Binaries and build artifacts
-bin/
-.artifacts/
-data/
+/bin/
+/.artifacts/
+/data/
 coverage*
 *.log
 
