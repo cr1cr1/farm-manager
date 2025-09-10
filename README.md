@@ -29,7 +29,8 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
     mise run lint
     mise run test
     mise run mod-tidy
-    mise run build
+    mise run build:container
+    mise run build:program
     mise run run
     mise run release-snapshot
 
