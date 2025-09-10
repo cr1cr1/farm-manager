@@ -193,11 +193,11 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - darwin
+      # - darwin
       - windows
     goarch:
       - amd64
-      - arm64
+      # - arm64
     flags:
       - -trimpath
     ldflags:
