@@ -26,6 +26,7 @@ Environment variables
 - RATE_LIMIT_BURST: burst size per IP (default 20).
 - CSRF_COOKIE_NAME: cookie name for CSRF token (default csrf_token).
 - CSRF_HEADER_NAME: header name for CSRF token (default X-CSRF-Token).
+- ADMIN_PASSWORD: initial admin password for first-run seeding (no default; must be set).
 
 Routing and auth (hypermedia, no REST)
 
@@ -39,6 +40,7 @@ Routing and auth (hypermedia, no REST)
 - Do not create REST endpoints (no /api, no JSON contracts). All interactions are server-rendered HTML or HTML fragments exchanged via hypermedia links/buttons/forms.
 - Session middleware using GoFrame sessions; missing/invalid session redirects to /app/login.
 - Passwords stored as bcrypt hashes in users table. On first run, seed a default admin user if none exists and force change on first login is optional but recommended.
+- Log access and errors via GoFrame logger; do not log sensitive info.
 
 Hypermedia (HATEOAS) with DataStar/DatastarUI
 
@@ -63,7 +65,7 @@ Database schema (SQLite) — users only
 - Enforce foreign_keys PRAGMA; use modernc.org/sqlite to keep CGO disabled.
 
 UI component library (templ + DataStar + DatastarUI)
-Build reusable templ components under [internal/web/templates/components](internal/web/templates/components):
+Build reusable templ components under [internal/web/templates/components](internal/web/templates/components/):
 
 - layout: app shell with header, footer, navigation slot, content slot; includes CDN scripts/styles for DataStar and DatastarUI; App base path in links.
 - header: app title, user menu (logout button/form).
@@ -101,7 +103,7 @@ Project structure (create or extend; domain removed)
 - [internal/web/middleware/rate_limit.go](internal/web/middleware/rate_limit.go)
   - Token-bucket limiter per IP using env-configured limits; return 429 on exceed.
 - [internal/web/handlers/auth.go](internal/web/handlers/auth.go)
-  - GET /app/login, POST /app/login, POST /app/logout; bcrypt verify; seed admin on first run (e.g., admin / admin123) if zero users; optional force password change flow.
+  - GET /app/login, POST /app/login, POST /app/logout; bcrypt verify; seed admin on first run (e.g., admin / admin123) if zero users but get password from env ADMIN_PASSWORD; optional force password change flow.
 - [internal/web/handlers/dashboard.go](internal/web/handlers/dashboard.go)
   - GET /app: renders the blank dashboard layout plus placeholder content and a sample hypermedia fragment endpoint for DatastarUI demonstration.
 - [internal/web/templates/components/.../*.templ](internal/web/templates/components/README.md)
@@ -166,7 +168,7 @@ Mermaid overview
 ```mermaid
 graph TD
 Client --> UI[Templ components]
-UI --> DataStar[DataStar + DatastarUI (hypermedia)]
+UI --> DataStar[DataStar + DatastarUI hypermedia]
 DataStar --> HTTP[GoFrame HTTP routes]
 HTTP --> RL[Rate limit]
 RL --> CSRF[CSRF]

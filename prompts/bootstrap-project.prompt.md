@@ -89,12 +89,12 @@ golangci-lint run ./...
 5) mise-tasks/test.sh
 ```bash
 #!/usr/bin/env bash
-#MISE description="Unit tests with race detector and coverage"
+#MISE description="Unit tests with race and coverage"
 #MISE short="test"
 #MISE sources=["go.mod","**/*.go"]
 set -euo pipefail
 mkdir -p ./.artifacts
-go test ./... -race -covermode=atomic -coverprofile=./.artifacts/coverage.out
+CGO_ENABLED=1 go test ./... -race -covermode=atomic -coverprofile=./.artifacts/coverage.out
 ```
 
 6) mise-tasks/build/program.sh
@@ -118,8 +118,21 @@ GOFLAGS="-trimpath" CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${VER
 #MISE short="run"
 #MISE sources=["**/*.go","**/*.templ","go.mod","go.sum"]
 set -euo pipefail
-# Watch .templ and .go; regenerate templates, then restart the app
-exec wgo -file=.templ -file=.go templ generate :: go run ./cmd/farm-manager
+
+# Prevent loop: run two watchers independently:
+# - watcher A: watches only .templ and runs templ generate
+# - watcher B: watches only .go/go.mod/go.sum and restarts the app
+# We also generate once before starting.
+templ generate
+
+# Ensure both watchers are terminated when the script exits.
+trap 'kill 0' EXIT
+
+# Watch templ files and regenerate on change (no app restart here).
+wgo -file=.templ templ generate &
+
+# Watch Go files and restart the app on change.
+wgo -file=.go -file=go.mod -file=go.sum go run ./cmd/farm-manager
 ```
 
 8) mise-tasks/templ.sh
@@ -150,7 +163,7 @@ goreleaser release --snapshot --clean
 #MISE outputs=["go.mod","go.sum"]
 set -euo pipefail
 go mod tidy
-# go mod vendor # Uncomment if you want to vendor dependencies
+# go mod vendor # Uncomment if you want to use vendoring
 ```
 
 11) mise-tasks/build/container.sh
@@ -308,14 +321,8 @@ ENTRYPOINT ["/farm-manager"]
 13) .dockerignore
 ```gitignore
 .git
-bin
-.mise
-.mise-local.*
 Dockerfile
 README.md
-*.log
-**/node_modules
-**/.DS_Store
 ```
 
 14) .env.example
@@ -330,6 +337,7 @@ PORT=8080
 # Binaries and build artifacts
 bin/
 .artifacts/
+data/
 coverage*
 *.log
 
@@ -340,7 +348,7 @@ coverage*
 .DS_Store
 ```
 
-16) README.md
+16) README.dev.md
 ```markdown
 # farm-manager
 
@@ -372,7 +380,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
     mise run lint
     mise run test
     mise run mod-tidy
-    mise run build
+    mise run build:program
     mise run build:container
     mise run run
     mise run release-snapshot
