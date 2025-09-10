@@ -1,0 +1,10 @@
+[env]
+CGO_ENABLED = "0"
+
+[tools]
+go = "1.25"
+goreleaser = "latest"
+"aqua:golangci-lint" = "latest"
+ubi = "latest"
+"ubi:bokwoon95/wgo" = "latest"
+"aqua:a-h/templ" = "latest"

@@ -1,0 +1,44 @@
+version: 2
+
+project_name: farm-manager
+
+builds:
+  - id: farm-manager
+    main: ./cmd/farm-manager
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: archives
+    builds:
+      - farm-manager
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  use: github
+
+release:
+  github:
+    owner: cr1cr1
+    name: farm-manager
+  draft: false
+  prerelease: auto

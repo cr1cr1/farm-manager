@@ -1,0 +1,11 @@
+# Binaries and build artifacts
+bin/
+.artifacts/
+coverage*
+*.log
+
+# Local env and tools
+.env
+.mise
+.mise-local.*
+.DS_Store
