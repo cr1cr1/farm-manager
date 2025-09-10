@@ -44,14 +44,15 @@ Routing and auth (hypermedia, no REST)
 
 Hypermedia (HATEOAS) with DataStar/DatastarUI
 
-- Use DataStar and DatastarUI declaratively to drive navigation and actions:
+- Use DataStar and DatastarUI (https://github.com/coreycole/datastarui) declaratively to drive navigation and actions:
+  - DatastarUI components are not a javascript library, rather a collection of templ files using datastar library to drive UI interactions.
   - Links and buttons include attributes to fetch server-rendered HTML and swap into a target element (e.g., main content area).
   - Forms submit with CSRF token; server responds with full page or partial fragment; client swaps accordingly.
   - Avoid bespoke JSON endpoints; favor standard HTTP verbs returning HTML snippets.
 - Progressive enhancement:
   - Ensure all pages render without JavaScript; DataStar/DatastarUI enhances UX with partial updates, modals, toasts, etc.
-- Example conventions (pseudo-attributes; adjust to DatastarUI exact API):
-  - data-star-get="/app/some-fragment" data-star-target="#content" data-star-swap="inner"
+- Datastar inclusion via CDN for now: `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>`
+- Example datastar usage: https://data-star.dev/examples/
   - Forms include a hidden CSRF field and may submit with data-star-post.
 
 Database schema (SQLite) — users only
