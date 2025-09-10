@@ -107,7 +107,7 @@ Dev hot reload
 
 - Served under /public
 - Minimal CSS at /public/css/app.css and JS at /public/js/app.js
-- JS enhances hypermedia by attaching CSRF header to fetch and initializing DataStar/DatastarUI when present.
+- JS enhances hypermedia by attaching a CSRF header to fetch. DataStar is loaded via ESM CDN: <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
 
 ### Database & migration
 

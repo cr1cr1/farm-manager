@@ -27,9 +27,9 @@ func (d *Dashboard) DashboardGet(r *ghttp.Request) {
 	_ = component.Render(r.GetCtx(), r.Response.Writer)
 }
 
-// PingFragment returns a tiny HTML snippet to be swapped into the dashboard content area.
+// PingFragment returns HTML containing an element with id=content for DataStar morphing.
 func (d *Dashboard) PingFragment(r *ghttp.Request) {
 	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	r.Response.WriteStatus(http.StatusOK)
-	r.Response.Write(`<div class="card"><h3>Pong</h3><p>Hypermedia fragment loaded at ` + r.GetClientIp() + `.</p></div>`)
+	r.Response.Write(`<section id="content" class="card"><h3>Pong</h3><p>Hypermedia fragment loaded at ` + r.GetClientIp() + `.</p></section>`)
 }
