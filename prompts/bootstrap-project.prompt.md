@@ -338,6 +338,7 @@ PORT=8080
 /bin/
 /.artifacts/
 /data/
+/tmp/
 coverage*
 *.log
 
