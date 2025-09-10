@@ -10,3 +10,5 @@ coverage*
 .mise
 .mise-local.*
 .DS_Store
+
+*_templ.go
