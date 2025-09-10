@@ -77,6 +77,7 @@ func main() {
 	protected := s.Group(base)
 	protected.Middleware(middleware.Csrf(), middleware.RequireAuth())
 	handlers.RegisterDashboardRoutes(protected)
+	handlers.RegisterProfileRoutes(protected, userRepo)
 
 	s.Run()
 }

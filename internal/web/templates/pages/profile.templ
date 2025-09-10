@@ -1,0 +1,75 @@
+package pages
+
+templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/public/css/app.css"/>
+			<!-- datastarUI (via CDN). See https://github.com/CoreyCole/datastarui -->
+			<!-- Adjust if a specific CSS/JS bundle is desired. -->
+		</head>
+		<body class="container">
+			<header class="header">
+				<h1>Farm Manager</h1>
+				<nav class="nav">
+					<a href={ basePath }>Dashboard</a>
+					<a href={ basePath + "/profile" } class="active">Profile</a>
+				</nav>
+				<form method="post" action={ basePath + "/logout" } class="logout-form">
+					<input type="hidden" name="csrf_token" value={ csrf }/>
+					<button type="submit" class="btn btn-secondary">Logout</button>
+				</form>
+			</header>
+			<main>
+				<section class="card">
+					<h2>User Profile</h2>
+					<p><strong>Username:</strong> { username }</p>
+					if success != "" {
+						<div class="alert alert-success">{ success }</div>
+					}
+					if errs["form"] != "" {
+						<div class="alert alert-danger">{ errs["form"] }</div>
+					}
+				</section>
+				<section class="card">
+					<h3>Change Password</h3>
+					<form method="post" action={ basePath + "/profile/password" } class="ds-form">
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+						<div class="form-row">
+							<label for="current_password" class="ds-label">Current password</label>
+							<input id="current_password" name="current_password" type="password" class="ds-input" autocomplete="current-password"/>
+							if errs["current_password"] != "" {
+								<div class="field-error">{ errs["current_password"] }</div>
+							}
+						</div>
+						<div class="form-row">
+							<label for="new_password" class="ds-label">New password</label>
+							<input id="new_password" name="new_password" type="password" class="ds-input" autocomplete="new-password"/>
+							if errs["new_password"] != "" {
+								<div class="field-error">{ errs["new_password"] }</div>
+							}
+						</div>
+						<div class="form-row">
+							<label for="confirm_password" class="ds-label">Confirm new password</label>
+							<input id="confirm_password" name="confirm_password" type="password" class="ds-input" autocomplete="new-password"/>
+							if errs["confirm_password"] != "" {
+								<div class="field-error">{ errs["confirm_password"] }</div>
+							}
+						</div>
+						<div class="actions">
+							<button type="submit" class="btn btn-primary ds-button">Update Password</button>
+						</div>
+					</form>
+				</section>
+			</main>
+			<footer class="footer">
+				<p>&copy; { YearNow() } Farm Manager</p>
+			</footer>
+			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
+			<script src="/public/js/app.js"></script>
+		</body>
+	</html>
+}
