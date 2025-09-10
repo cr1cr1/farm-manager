@@ -97,7 +97,7 @@ mkdir -p ./.artifacts
 go test ./... -race -covermode=atomic -coverprofile=./.artifacts/coverage.out
 ```
 
-6) mise-tasks/build.sh
+6) mise-tasks/build/program.sh
 ```bash
 #!/usr/bin/env bash
 #MISE description="Build binary to bin/farm-manager"
@@ -151,6 +151,20 @@ goreleaser release --snapshot --clean
 set -euo pipefail
 go mod tidy
 # go mod vendor # Uncomment if you want to vendor dependencies
+```
+
+11) mise-tasks/build/container.sh
+```bash
+#!/usr/bin/env bash
+#MISE description="Build local container image tagged with project name"
+#MISE short="build:container"
+#MISE sources=["Dockerfile","go.mod","go.sum","**/*.go","**/*.templ"]
+set -euo pipefail
+IMAGE="${IMAGE:-farm-manager}"
+TAG="${TAG:-local}"
+set -x
+docker build -t "${IMAGE}:${TAG}" .
+docker image ls "${IMAGE}:${TAG}"
 ```
 
 10) .goreleaser.yaml
@@ -208,10 +222,15 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 permissions:
   contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   goreleaser:
@@ -225,7 +244,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.x"
+          go-version: '1.25.x'
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -234,6 +253,37 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 ```
 
 12) Dockerfile
@@ -323,6 +373,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
     mise run test
     mise run mod-tidy
     mise run build
+    mise run build:container
     mise run run
     mise run release-snapshot
 
@@ -340,7 +391,13 @@ Dev hot reload
 
 ## Releasing
 
-- Tagging with v* (e.g., v0.1.0) triggers GitHub Actions to build and publish a GitHub Release via GoReleaser.
+- Tagging with v* (e.g., v0.1.0) triggers GitHub Actions to:
+  - Build and publish a GitHub Release via GoReleaser
+  - Build and push the container image to GHCR at ghcr.io/cr1cr1/farm-manager with version and latest tags
+- Pull example:
+
+      docker pull ghcr.io/cr1cr1/farm-manager:v0.1.0
+
 - For local testing, use: mise run release-snapshot
 ```
 
@@ -351,6 +408,7 @@ Acceptance criteria
 - mise run templ, lint, test, build, run, release-snapshot succeed on a clean checkout.
 - Docker image builds and runs, exposing port 8080.
 - Pushing a tag matching v* triggers the GitHub Actions workflow and completes successfully.
+- Tag push builds and pushes a multi-arch image to GHCR with version and latest tags.
 
 Implementation notes
 - Respect 12-factor: configuration exclusively via environment variables; do not commit secrets.
@@ -358,5 +416,6 @@ Implementation notes
 - Keep dependencies minimal; go mod tidy will resolve GoFrame.
 - Scripts use set -euo pipefail and should be executable.
 - Define mise tasks via #MISE headers in scripts under mise-tasks/; do not define tasks in mise.toml.
+- GitHub Actions container publish uses GHCR; requires packages: write permission and docker/login with GITHUB_TOKEN.
 - GoReleaser embeds version info via ldflags; main.go exposes it in /healthz.
 - No devcontainer, no database.
