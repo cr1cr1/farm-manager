@@ -2,6 +2,7 @@
 /bin/
 /.artifacts/
 /data/
+/dist/
 /tmp/
 coverage*
 *.log

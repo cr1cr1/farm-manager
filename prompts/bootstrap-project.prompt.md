@@ -267,8 +267,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -294,7 +299,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 ```
@@ -338,6 +343,7 @@ PORT=8080
 /bin/
 /.artifacts/
 /data/
+/dist/
 /tmp/
 coverage*
 *.log
