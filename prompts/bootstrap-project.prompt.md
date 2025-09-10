@@ -346,8 +346,6 @@ coverage*
 .mise
 .mise-local.*
 .DS_Store
-
-*_templ.go
 ```
 
 16) README.dev.md
