@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"os"
 
+	"github.com/cr1cr1/farm-manager/internal/data"
+	appdb "github.com/cr1cr1/farm-manager/internal/db"
+	"github.com/cr1cr1/farm-manager/internal/web/handlers"
+	"github.com/cr1cr1/farm-manager/internal/web/middleware"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 )
@@ -21,7 +26,27 @@ func addrFromEnv() string {
 }
 
 func main() {
+	ctx := context.Background()
+
+	// Setup DB and run migrations.
+	db, err := appdb.Open(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer appdb.Close(db)
+
+	if err := appdb.Migrate(ctx, db); err != nil {
+		panic(err)
+	}
+
+	// Repositories.
+	userRepo := data.NewSQLiteUserRepo(db)
+
+	// Server.
 	s := g.Server()
+	s.SetAddr(addrFromEnv())
+
+	// Health check (infra).
 	s.BindHandler("/healthz", func(r *ghttp.Request) {
 		r.Response.WriteJson(g.Map{
 			"status":  "ok",
@@ -31,6 +56,24 @@ func main() {
 			"addr":    addrFromEnv(),
 		})
 	})
-	s.SetAddr(addrFromEnv())
+
+	// Static assets under /public
+	s.AddStaticPath("/public", "./public")
+
+	// Global rate limit.
+	s.Use(middleware.RateLimit())
+
+	base := middleware.BasePath()
+
+	// Public routes (login, logout). CSRF applied for POST.
+	public := s.Group(base)
+	public.Middleware(middleware.Csrf())
+	handlers.RegisterAuthRoutes(public, userRepo)
+
+	// Protected routes (dashboard and fragments).
+	protected := s.Group(base)
+	protected.Middleware(middleware.Csrf(), middleware.RequireAuth())
+	handlers.RegisterDashboardRoutes(protected)
+
 	s.Run()
 }

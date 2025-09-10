@@ -1,0 +1,48 @@
+package pages
+
+templ LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/public/css/app.css"/>
+		</head>
+		<body class="container">
+			<header class="header">
+				<h1>Farm Manager</h1>
+			</header>
+			<main class="card">
+				<h2>Sign in</h2>
+				if errs["form"] != "" {
+					<div class="alert alert-danger">{ errs["form"] }</div>
+				}
+				<form method="post" action={ basePath + "/login" }>
+					<input type="hidden" name="csrf_token" value={ csrf }/>
+					<div class="form-row">
+						<label for="username">Username</label>
+						<input id="username" name="username" type="text" value={ username } autocomplete="username"/>
+						if errs["username"] != "" {
+							<div class="field-error">{ errs["username"] }</div>
+						}
+					</div>
+					<div class="form-row">
+						<label for="password">Password</label>
+						<input id="password" name="password" type="password" autocomplete="current-password"/>
+						if errs["password"] != "" {
+							<div class="field-error">{ errs["password"] }</div>
+						}
+					</div>
+					<div class="actions">
+						<button type="submit" class="btn btn-primary">Login</button>
+					</div>
+				</form>
+			</main>
+			<footer class="footer">
+				<p>&copy; { YearNow() } Farm Manager</p>
+			</footer>
+			<script src="/public/js/app.js"></script>
+		</body>
+	</html>
+}

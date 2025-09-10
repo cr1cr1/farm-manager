@@ -1,9 +1,3 @@
 .git
-bin
-.mise
-.mise-local.*
 Dockerfile
 README.md
-*.log
-**/node_modules
-**/.DS_Store
