@@ -44,6 +44,9 @@ func main() {
 
 	// Server.
 	s := g.Server()
+	// Enable access and error logging via GoFrame logger (no sensitive data logged).
+	s.SetAccessLogEnabled(true)
+	s.SetErrorLogEnabled(true)
 	s.SetAddr(addrFromEnv())
 
 	// Health check (infra).

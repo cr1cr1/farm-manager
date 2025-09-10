@@ -335,9 +335,9 @@ PORT=8080
 15) .gitignore
 ```gitignore
 # Binaries and build artifacts
-bin/
-.artifacts/
-data/
+/bin/
+/.artifacts/
+/data/
 coverage*
 *.log
 

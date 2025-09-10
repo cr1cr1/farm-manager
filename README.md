@@ -47,6 +47,11 @@ Dev hot reload
 
     curl -sS http://localhost:8080/healthz
 
+## Logging
+
+- Access and error logging are enabled via GoFrame server (see [cmd/farm-manager/main.go](cmd/farm-manager/main.go)).
+- Do not log sensitive information (passwords, tokens, session IDs, CSRF tokens).
+
 ## Releasing
 
 - Tagging with v* (e.g., v0.1.0) triggers GitHub Actions to build and publish a GitHub Release via GoReleaser.
