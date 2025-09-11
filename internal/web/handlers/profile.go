@@ -86,13 +86,8 @@ func (p *Profile) PasswordPost(r *ghttp.Request) {
 	}
 
 	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
-	frag := pages.ProfileAlertFragment(
-		success,
-		errs["form"],
-		errs["current_password"],
-		errs["new_password"],
-		errs["confirm_password"],
-		"profile_password_form",
-	)
+	basePath := middleware.BasePath()
+	csrf := middleware.HiddenCsrfFieldValue(r)
+	frag := pages.ProfilePasswordFragment(basePath, csrf, errs, success)
 	_ = frag.Render(r.GetCtx(), r.Response.Writer)
 }

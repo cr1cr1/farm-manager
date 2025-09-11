@@ -366,6 +366,8 @@ coverage*
 .mise
 .mise-local.*
 .DS_Store
+
+/farm-manager
 ```
 
 19) README.dev.md

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/cr1cr1/farm-manager/internal/data"
 	"github.com/cr1cr1/farm-manager/internal/domain"
 	"github.com/cr1cr1/farm-manager/internal/web/middleware"
@@ -77,8 +78,22 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 				// Success
 				middleware.SetLoggedIn(r, u.Username)
 				middleware.SetNoCache(r)
-				r.Response.RedirectTo(middleware.BasePath())
-				return
+
+				// Check if this is a DataStar request
+				isDataStarRequest := r.Header.Get("datastar-request") == "true"
+				if isDataStarRequest {
+					// For DataStar requests, return JavaScript to redirect
+					basePath := middleware.BasePath()
+					js := fmt.Sprintf("window.location.href = %q;", basePath)
+					r.Response.Header().Set("Content-Type", "text/javascript")
+					r.Response.WriteHeader(200)
+					r.Response.Writer.Write([]byte(js))
+					return
+				} else {
+					// For regular requests, redirect
+					r.Response.RedirectTo(middleware.BasePath())
+					return
+				}
 			}
 			errs["form"] = "Invalid username or password"
 		}
@@ -86,7 +101,19 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 
 	csrf := middleware.HiddenCsrfFieldValue(r)
 	title := "Login"
-	component := pages.LoginPage(middleware.BasePath(), title, csrf, errs, username)
+
+	// Check if this is a DataStar request (has datastar header)
+	isDataStarRequest := r.Header.Get("datastar-request") == "true"
+
+	var component templ.Component
+	if isDataStarRequest && len(errs) > 0 {
+		// Return fragment for DataStar requests with errors
+		component = pages.LoginFragment(middleware.BasePath(), csrf, errs, username)
+	} else {
+		// Return full page for initial load or non-DataStar requests
+		component = pages.LoginPage(middleware.BasePath(), title, csrf, errs, username)
+	}
+
 	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_ = component.Render(r.GetCtx(), r.Response.Writer)
 }

@@ -33,20 +33,20 @@ func DashboardContent(basePath string, csrf string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"card\"><h2>Dashboard</h2><p>This is a blank dashboard placeholder.</p><div class=\"actions\"><a class=\"btn btn-primary\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h2 class=\"text-2xl font-semibold text-foreground\">Dashboard</h2></div><p class=\"text-muted-foreground mb-4\">This is a blank dashboard placeholder.</p><div class=\"flex gap-2\"><a class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/fragment/ping")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/dashboard.templ`, Line: 14, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/dashboard.templ`, Line: 16, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-on-click=\"@get(el.getAttribute('href')); evt.preventDefault();\">Load Fragment (Ping)</a></div></section><section id=\"content\" class=\"card\"><p>Fragment target area.</p></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-on-click=\"@get(el.getAttribute('href')); evt.preventDefault();\">Load Fragment (Ping)</a></div></div><div id=\"content\" class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6\"><p class=\"text-muted-foreground\">Fragment target area.</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

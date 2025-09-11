@@ -2,43 +2,89 @@ package layouts
 
 import (
 	themetoggle "github.com/coreycole/datastarui/components/themetoggle"
+	"path/filepath"
 	"time"
 )
 
 // Root provides the shared HTML skeleton.
 templ Root(basePath string, title string, showNav bool, csrf string) {
+	{{
+		// Find the hashed CSS file
+		cssFile := "/public/css/app.css" // fallback
+		if files, err := filepath.Glob("public/css/app.*.css"); err == nil && len(files) > 0 {
+			// Extract just the filename from the full path
+			fileName := filepath.Base(files[0])
+			cssFile = "/public/css/" + fileName
+		}
+
+		// Determine which tab is active based on the title
+		isDashboardActive := title == "Dashboard" || title == "Farm Manager"
+		isProfileActive := title == "Profile"
+	}}
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
 			<title>{ title }</title>
-			<link rel="stylesheet" href="/public/css/app.css"/>
-			<!-- Theme initialization: set early to avoid flash -->
-			<script>
-			// initTheme returns the initial theme string and applies the dark class
-			function initTheme(){
-				try{
-					var stored = localStorage.getItem('theme');
-					if(stored && (stored === 'light' || stored === 'dark' || stored === 'system')){
-						if(stored === 'dark') document.documentElement.classList.add('dark');
-						if(stored === 'light') document.documentElement.classList.remove('dark');
-						if(stored === 'system') {
-							if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
-								document.documentElement.classList.add('dark');
-							} else {
-								document.documentElement.classList.remove('dark');
-							}
-						}
-						return stored;
-					}
-					// default to system
-					var theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-					if(theme === 'dark') document.documentElement.classList.add('dark');
-					return 'system';
-				}catch(e){ return 'system'; }
-			}
+			<link rel="stylesheet" href={ cssFile }/>
+			<!-- PWA Manifest -->
+			<link rel="manifest" href="/public/manifest.json"/>
+			<!-- Apple PWA Support -->
+			<meta name="mobile-web-app-capable" content="yes"/>
+			<meta name="mobile-web-app-capable-status-bar-style" content="default"/>
+			<meta name="mobile-web-app-capable-title" content="Farm Manager"/>
+			<!-- Apple Touch Icons -->
+			<link rel="apple-touch-icon" href="/public/img/icon-180.png"/>
+			<link rel="apple-touch-icon" sizes="152x152" href="/public/img/icon-152.png"/>
+			<link rel="apple-touch-icon" sizes="120x120" href="/public/img/icon-120.png"/>
+			<!-- Popover API Polyfill -->
+			<script type="module">
+				if (!('popover' in HTMLElement.prototype)) {
+					console.log('Loading Popover API polyfill...');
+					import("https://cdn.jsdelivr.net/npm/@oddbird/popover-polyfill@latest");
+				}
 			</script>
+			<!-- CSS Anchor Positioning Polyfill -->
+			<script type="module">
+				if (!("anchorName" in document.documentElement.style)) {
+					console.log('🔧 CSS Anchor Positioning is not natively supported');
+					console.log('📦 Loading CSS Anchor Positioning polyfill from jsDelivr...');
+					window.CSS_ANCHOR_POLYFILL_LOADING = true;
+
+					import("https://cdn.jsdelivr.net/npm/@oddbird/css-anchor-positioning@latest/dist/css-anchor-positioning.js")
+						.then(() => {
+							console.log('✅ CSS Anchor Positioning polyfill loaded successfully!');
+							window.CSS_ANCHOR_POLYFILL_LOADED = true;
+							window.CSS_ANCHOR_POLYFILL_LOADING = false;
+
+							// Dispatch custom event to notify components
+							window.dispatchEvent(new CustomEvent('css-anchor-polyfill-loaded'));
+						})
+						.catch((error) => {
+							console.error('❌ Failed to load CSS Anchor Positioning polyfill:', error);
+							window.CSS_ANCHOR_POLYFILL_LOADING = false;
+						});
+				} else {
+					console.log('✅ CSS Anchor Positioning is natively supported - no polyfill needed');
+					window.CSS_ANCHOR_POLYFILL_LOADED = false;
+				}
+			</script>
+			<!-- Theme initialization -->
+			<script>
+				// Initialize theme from localStorage or system preference
+				function initTheme() {
+					const theme = localStorage.getItem('theme') ||
+						(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+					document.documentElement.classList.toggle('dark', theme === 'dark');
+					return theme;
+				}
+
+				// Set initial theme before page renders
+				initTheme();
+			</script>
+			<!-- Enable View Transitions API -->
+			<meta name="view-transition" content="same-origin"/>
 		</head>
 		<body class="min-h-screen bg-background font-sans antialiased" data-signals="{theme: initTheme()}">
 			<div class="relative flex min-h-screen flex-col bg-background">
@@ -52,24 +98,24 @@ templ Root(basePath string, title string, showNav bool, csrf string) {
 										<span class="font-semibold text-foreground inline-flex items-center">Farm Manager</span>
 									</a>
 									if showNav {
-										<nav class="hidden md:flex items-center gap-4 text-sm lg:gap-6 [&_a]:no-underline ml-6">
-											<a class="transition-colors hover:text-foreground/80 text-muted-foreground" href={ basePath }>
+										<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px] ml-6">
+											<a class={ "text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-background hover:text-foreground", templ.KV("bg-background", isDashboardActive), templ.KV("text-foreground", isDashboardActive), templ.KV("shadow-sm", isDashboardActive) } href={ basePath }>
 												Dashboard
 											</a>
-											<a class="transition-colors hover:text-foreground/80 text-muted-foreground" href={ basePath + "/profile" }>
+											<a class={ "text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-background hover:text-foreground", templ.KV("bg-background", isProfileActive), templ.KV("text-foreground", isProfileActive), templ.KV("shadow-sm", isProfileActive) } href={ basePath + "/profile" }>
 												Profile
 											</a>
-										</nav>
+										</div>
 									}
 								</div>
 								<div class="flex items-center space-x-2">
 									<nav class="flex items-center space-x-1">
-										@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{Class: "btn-ghost"})
+										@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{})
 									</nav>
 									if showNav {
 										<form method="post" action={ basePath + "/logout" } class="logout-form">
 											<input type="hidden" name="csrf_token" value={ csrf }/>
-											<button type="submit" class="btn btn-secondary">Logout</button>
+											<button type="submit" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 h-9 px-4 py-2">Logout</button>
 										</form>
 									}
 								</div>

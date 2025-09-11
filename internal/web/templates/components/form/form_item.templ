@@ -1,0 +1,21 @@
+package form
+
+import formc "github.com/coreycole/datastarui/components/form"
+
+// FormItemArgs wraps the datastarui FormItemArgs
+type FormItemArgs struct {
+	Class      string
+	Attributes map[string]any
+}
+
+// FormItem is a custom wrapper around datastarui FormItem with proper spacing
+templ FormItem(args FormItemArgs) {
+	<div class="mt-4">
+		@formc.FormItem(formc.FormItemArgs{
+			Class:      args.Class,
+			Attributes: args.Attributes,
+		}) {
+			{ children... }
+		}
+	</div>
+}

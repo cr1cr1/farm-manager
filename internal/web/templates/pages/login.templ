@@ -4,22 +4,28 @@ import (
 	buttonc "github.com/coreycole/datastarui/components/button"
 	formc "github.com/coreycole/datastarui/components/form"
 	inputc "github.com/coreycole/datastarui/components/input"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
 	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
 )
 
 // LoginContent is the fragment (no layout) containing the login form.
 templ LoginContent(basePath string, csrf string, errs map[string]string, username string) {
-	<section class="card">
-		<h2>Sign in</h2>
+	<div id="login-container" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 max-w-md mx-auto">
+		<div class="mb-6">
+			<h2 class="text-2xl font-semibold text-foreground">Sign in</h2>
+		</div>
 		if errs["form"] != "" {
-			<div class="alert alert-danger">{ errs["form"] }</div>
+			<div class="alert-error">{ errs["form"] }</div>
 		}
 		@formc.Form(formc.FormArgs{
 			ID:     "login_form",
 			Action: basePath + "/login",
+			Attributes: templ.Attributes{
+				"data-target": "#login-container",
+			},
 		}) {
 			<input type="hidden" name="csrf_token" value={ csrf }/>
-			@formc.FormItem(formc.FormItemArgs{}) {
+			@form.FormItem(form.FormItemArgs{}) {
 				@formc.FormLabel(formc.FormLabelArgs{
 					For:      "username",
 					HasError: errs["username"] != "",
@@ -40,7 +46,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 					Message: errs["username"],
 				})
 			}
-			@formc.FormItem(formc.FormItemArgs{}) {
+			@form.FormItem(form.FormItemArgs{}) {
 				@formc.FormLabel(formc.FormLabelArgs{
 					For:      "password",
 					HasError: errs["password"] != "",
@@ -58,7 +64,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 					Message: errs["password"],
 				})
 			}
-			<div class="actions">
+			<div class="flex gap-2 mt-6">
 				@buttonc.Button(buttonc.ButtonArgs{
 					Type:    "submit",
 					Variant: "default",
@@ -67,7 +73,75 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 				}
 			</div>
 		}
-	</section>
+	</div>
+}
+
+// LoginFragment returns just the login content for DataStar fragment replacement
+templ LoginFragment(basePath string, csrf string, errs map[string]string, username string) {
+	<div id="login-container" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 max-w-md mx-auto">
+		<div class="mb-6">
+			<h2 class="text-2xl font-semibold text-foreground">Sign in</h2>
+		</div>
+		if errs["form"] != "" {
+			<div class="alert-error">{ errs["form"] }</div>
+		}
+		@formc.Form(formc.FormArgs{
+			ID:     "login_form",
+			Action: basePath + "/login",
+			Attributes: templ.Attributes{
+				"data-target": "#login-container",
+			},
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			@form.FormItem(form.FormItemArgs{}) {
+				@formc.FormLabel(formc.FormLabelArgs{
+					For:      "username",
+					HasError: errs["username"] != "",
+				}) {
+					Username
+				}
+				@inputc.Input(inputc.InputArgs{
+					Type: "text",
+					ID:   "username",
+					Name: "username",
+					Attributes: templ.Attributes{
+						"autocomplete": "username",
+						"value":        username,
+					},
+				})
+				@formc.FormMessage(formc.FormMessageArgs{
+					ID:      "msg-username",
+					Message: errs["username"],
+				})
+			}
+			@form.FormItem(form.FormItemArgs{}) {
+				@formc.FormLabel(formc.FormLabelArgs{
+					For:      "password",
+					HasError: errs["password"] != "",
+				}) {
+					Password
+				}
+				@inputc.Input(inputc.InputArgs{
+					Type:       "password",
+					ID:         "password",
+					Name:       "password",
+					Attributes: templ.Attributes{"autocomplete": "current-password"},
+				})
+				@formc.FormMessage(formc.FormMessageArgs{
+					ID:      "msg-password",
+					Message: errs["password"],
+				})
+			}
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Login
+				}
+			</div>
+		}
+	</div>
 }
 
 // LoginPage composes BaseLayout + LoginContent for initial full-page load (no nav).

@@ -26,24 +26,4 @@
     }
     return originalFetch.call(this, input, init);
   };
-
-  // Initialize DataStar / DatastarUI if present.
-  function initDataStar() {
-    try {
-      if (window.datastar && typeof window.datastar.init === "function") {
-        window.datastar.init();
-      }
-      if (window.datastarui && typeof window.datastarui.init === "function") {
-        window.datastarui.init();
-      }
-    } catch (e) {
-      // no-op
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initDataStar);
-  } else {
-    initDataStar();
-  }
 })();

@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	themetoggle "github.com/coreycole/datastarui/components/themetoggle"
+	"path/filepath"
 	"time"
 )
 
@@ -35,6 +36,18 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+
+		// Find the hashed CSS file
+		cssFile := "/public/css/app.css" // fallback
+		if files, err := filepath.Glob("public/css/app.*.css"); err == nil && len(files) > 0 {
+			// Extract just the filename from the full path
+			fileName := filepath.Base(files[0])
+			cssFile = "/public/css/" + fileName
+		}
+
+		// Determine which tab is active based on the title
+		isDashboardActive := title == "Dashboard" || title == "Farm Manager"
+		isProfileActive := title == "Profile"
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -42,106 +55,163 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 15, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 29, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/public/css/app.css\"><!-- Theme initialization: set early to avoid flash --><script>\n\t\t\t// initTheme returns the initial theme string and applies the dark class\n\t\t\tfunction initTheme(){\n\t\t\t\ttry{\n\t\t\t\t\tvar stored = localStorage.getItem('theme');\n\t\t\t\t\tif(stored && (stored === 'light' || stored === 'dark' || stored === 'system')){\n\t\t\t\t\t\tif(stored === 'dark') document.documentElement.classList.add('dark');\n\t\t\t\t\t\tif(stored === 'light') document.documentElement.classList.remove('dark');\n\t\t\t\t\t\tif(stored === 'system') {\n\t\t\t\t\t\t\tif(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){\n\t\t\t\t\t\t\t\tdocument.documentElement.classList.add('dark');\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tdocument.documentElement.classList.remove('dark');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn stored;\n\t\t\t\t\t}\n\t\t\t\t\t// default to system\n\t\t\t\t\tvar theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';\n\t\t\t\t\tif(theme === 'dark') document.documentElement.classList.add('dark');\n\t\t\t\t\treturn 'system';\n\t\t\t\t}catch(e){ return 'system'; }\n\t\t\t}\n\t\t\t</script></head><body class=\"min-h-screen bg-background font-sans antialiased\" data-signals=\"{theme: initTheme()}\"><div class=\"relative flex min-h-screen flex-col bg-background\"><div data-wrapper=\"\" class=\"border-grid flex flex-1 flex-col\"><!-- Header --><header class=\"border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60\"><div class=\"container-wrapper\"><div class=\"container h-14 flex flex-row items-center justify-between\"><div class=\"flex flex-row items-center gap-3\"><a class=\"flex items-center no-underline pb-[0.5px]\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(cssFile)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 51, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 30, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><span class=\"font-semibold text-foreground inline-flex items-center\">Farm Manager</span></a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><!-- PWA Manifest --><link rel=\"manifest\" href=\"/public/manifest.json\"><!-- Apple PWA Support --><meta name=\"mobile-web-app-capable\" content=\"yes\"><meta name=\"mobile-web-app-capable-status-bar-style\" content=\"default\"><meta name=\"mobile-web-app-capable-title\" content=\"Farm Manager\"><!-- Apple Touch Icons --><link rel=\"apple-touch-icon\" href=\"/public/img/icon-180.png\"><link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"/public/img/icon-152.png\"><link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"/public/img/icon-120.png\"><!-- Popover API Polyfill --><script type=\"module\">\n\t\t\t\tif (!('popover' in HTMLElement.prototype)) {\n\t\t\t\t\tconsole.log('Loading Popover API polyfill...');\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/popover-polyfill@latest\");\n\t\t\t\t}\n\t\t\t</script><!-- CSS Anchor Positioning Polyfill --><script type=\"module\">\n\t\t\t\tif (!(\"anchorName\" in document.documentElement.style)) {\n\t\t\t\t\tconsole.log('🔧 CSS Anchor Positioning is not natively supported');\n\t\t\t\t\tconsole.log('📦 Loading CSS Anchor Positioning polyfill from jsDelivr...');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = true;\n\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/css-anchor-positioning@latest/dist/css-anchor-positioning.js\")\n\t\t\t\t\t\t.then(() => {\n\t\t\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning polyfill loaded successfully!');\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = true;\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\n\t\t\t\t\t\t\t// Dispatch custom event to notify components\n\t\t\t\t\t\t\twindow.dispatchEvent(new CustomEvent('css-anchor-polyfill-loaded'));\n\t\t\t\t\t\t})\n\t\t\t\t\t\t.catch((error) => {\n\t\t\t\t\t\t\tconsole.error('❌ Failed to load CSS Anchor Positioning polyfill:', error);\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\t\t\t\t\t\t});\n\t\t\t\t} else {\n\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning is natively supported - no polyfill needed');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = false;\n\t\t\t\t}\n\t\t\t</script><!-- Theme initialization --><script>\n\t\t\t\t// Initialize theme from localStorage or system preference\n\t\t\t\tfunction initTheme() {\n\t\t\t\t\tconst theme = localStorage.getItem('theme') ||\n\t\t\t\t\t\t(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');\n\t\t\t\t\tdocument.documentElement.classList.toggle('dark', theme === 'dark');\n\t\t\t\t\treturn theme;\n\t\t\t\t}\n\n\t\t\t\t// Set initial theme before page renders\n\t\t\t\tinitTheme();\n\t\t\t</script><!-- Enable View Transitions API --><meta name=\"view-transition\" content=\"same-origin\"></head><body class=\"min-h-screen bg-background font-sans antialiased\" data-signals=\"{theme: initTheme()}\"><div class=\"relative flex min-h-screen flex-col bg-background\"><div data-wrapper=\"\" class=\"border-grid flex flex-1 flex-col\"><!-- Header --><header class=\"border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60\"><div class=\"container-wrapper\"><div class=\"container h-14 flex flex-row items-center justify-between\"><div class=\"flex flex-row items-center gap-3\"><a class=\"flex items-center no-underline pb-[0.5px]\" href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 templ.SafeURL
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 97, Col: 77}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><span class=\"font-semibold text-foreground inline-flex items-center\">Farm Manager</span></a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showNav {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<nav class=\"hidden md:flex items-center gap-4 text-sm lg:gap-6 [&_a]:no-underline ml-6\"><a class=\"transition-colors hover:text-foreground/80 text-muted-foreground\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px] ml-6\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 templ.SafeURL
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 56, Col: 102}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			var templ_7745c5c3_Var5 = []any{"text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-background hover:text-foreground", templ.KV("bg-background", isDashboardActive), templ.KV("text-foreground", isDashboardActive), templ.KV("shadow-sm", isDashboardActive)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">Dashboard</a> <a class=\"transition-colors hover:text-foreground/80 text-muted-foreground\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 templ.SafeURL
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/profile")
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var5).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 59, Col: 115}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\">Profile</a></nav>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><div class=\"flex items-center space-x-2\"><nav class=\"flex items-center space-x-1\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{Class: "btn-ghost"}).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</nav>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if showNav {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<form method=\"post\" action=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 templ.SafeURL
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/logout")
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 70, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 1, Col: 0}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"logout-form\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+			var templ_7745c5c3_Var7 templ.SafeURL
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 71, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 102, Col: 711}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"> <button type=\"submit\" class=\"btn btn-secondary\">Logout</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Dashboard</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 = []any{"text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-background hover:text-foreground", templ.KV("bg-background", isProfileActive), templ.KV("text-foreground", isProfileActive), templ.KV("shadow-sm", isProfileActive)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var8).String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 1, Col: 0}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 templ.SafeURL
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/profile")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 105, Col: 718}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">Profile</a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div></div></header><main class=\"flex flex-1 flex-col\"><div class=\"container-wrapper flex flex-1\"><div class=\"container mx-auto px-4 py-6 md:px-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><div class=\"flex items-center space-x-2\"><nav class=\"flex items-center space-x-1\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</nav>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if showNav {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<form method=\"post\" action=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var11 templ.SafeURL
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/logout")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 116, Col: 59}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"logout-form\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 117, Col: 62}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"> <button type=\"submit\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 h-9 px-4 py-2\">Logout</button></form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div></div></header><main class=\"flex flex-1 flex-col\"><div class=\"container-wrapper flex flex-1\"><div class=\"container mx-auto px-4 py-6 md:px-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,20 +219,20 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></main><footer class=\"footer border-t bg-background/95\"><div class=\"container-wrapper\"><div class=\"container px-4 py-4\"><p class=\"text-sm text-muted-foreground\">&copy; ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div></main><footer class=\"footer border-t bg-background/95\"><div class=\"container-wrapper\"><div class=\"container px-4 py-4\"><p class=\"text-sm text-muted-foreground\">&copy; ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Year())
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Year())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 89, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 135, Col: 75}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " Farm Manager</p></div></div></footer></div></div><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js\"></script><script src=\"/public/js/app.js\"></script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " Farm Manager</p></div></div></footer></div></div><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js\"></script><script src=\"/public/js/app.js\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
