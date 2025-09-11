@@ -15,7 +15,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
 ## Configuration (12-factor)
 
 - Configuration is provided via environment variables.
-- PORT controls the HTTP listen port (default 8080 when unset).
+- PORT controls the HTTP listen port (default 3000 when unset).
 - Do not commit secrets. Use a local .env (not committed) or export in your shell.
 - Example:
 
@@ -31,6 +31,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
     mise run mod-tidy
     mise run build:container
     mise run build:program
+    mise run build:tailwind
     mise run run
     mise run release-snapshot
 
@@ -40,12 +41,12 @@ Dev hot reload
 
 ## Docker
 
-    docker build -t farm-manager:local .
-    docker run --rm -e PORT=8080 -p 8080:8080 farm-manager:local
+    mise run build:container
+    docker run --rm -e PORT=3000 -p 3000:3000 farm-manager:local
 
 ## Health check
 
-    curl -sS http://localhost:8080/healthz
+    curl -sS http://localhost:3000/healthz
 
 ## Logging
 
@@ -61,7 +62,7 @@ Dev hot reload
 
 - Base path: /app (override via APP_BASE_PATH)
 - Environment:
-  - PORT=8080
+  - PORT=3000
   - APP_BASE_PATH=/app
   - SQLITE_DSN="file:./data/app.db?cache=shared&amp;mode=rwc"
   - SESSION_SECRET="set-a-32+-byte-secret"
@@ -75,18 +76,15 @@ Dev hot reload
 
 1) Install tools and deps
    mise install
-   go mod tidy
+   mise run tidy
 
-2) Generate templ code
-   mise run templ
-
-3) Start
+2) Start
    mise run run
 
    # or: go run ./cmd/farm-manager
 
 4) Open:
-   <http://localhost:8080/app/login>
+   <http://localhost:3000/app/login>
 
 ### First login
 
