@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #MISE description="Unit tests with race and coverage"
-#MISE short="test"
 #MISE sources=["go.mod","**/*.go"]
 set -euo pipefail
 mkdir -p ./.artifacts

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #MISE description="Tidy go.mod and go.sum"
-#MISE short="mod-tidy"
+#MISE alias="mt"
 #MISE sources=["go.mod","go.sum"]
 #MISE outputs=["go.mod","go.sum"]
 set -euo pipefail

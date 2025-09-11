@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #MISE description="Build binary to bin/farm-manager"
-#MISE short="build"
+#MISE alias="bp"
 #MISE env={CGO_ENABLED="0"}
 #MISE sources=["go.mod","**/*.go"]
 #MISE outputs=["bin/farm-manager"]
