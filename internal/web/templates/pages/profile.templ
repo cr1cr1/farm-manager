@@ -1,10 +1,11 @@
 package pages
 
 import (
-	buttonc "github.com/cr1cr1/farm-manager/internal/web/templates/components/button"
-	formc "github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
-	inputc "github.com/cr1cr1/farm-manager/internal/web/templates/components/input"
-	utilsc "github.com/cr1cr1/farm-manager/internal/web/templates/components/utils"
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
 )
 
 // ProfileContent is the fragment (no layout) for the profile page main area.
@@ -12,6 +13,18 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 	<section class="card">
 		<h2>User Profile</h2>
 		<p><strong>Username:</strong> { username }</p>
+	</section>
+	<section class="card">
+		<div data-signals="{theme: 'system'}">
+			<h3>Appearance</h3>
+			<p class="text-sm text-muted-foreground">Choose light, dark or system theme.</p>
+			<label class="text-sm font-medium">Theme</label>
+			<select data-bind="$theme" class="w-full p-2 border rounded" data-on-change={ "localStorage.setItem('theme', $theme); document.documentElement.classList.toggle('dark', $theme === 'dark');" }>
+				<option value="light">Light</option>
+				<option value="dark">Dark</option>
+				<option value="system">System</option>
+			</select>
+		</div>
 	</section>
 	<section class="card">
 		{{
@@ -44,7 +57,7 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 						For:      "current_password",
 						HasError: errs["current_password"] != "",
 					}) {
-						Current password 
+						Current password
 					}
 					@inputc.Input(inputc.InputArgs{
 						Type:       "password",
@@ -63,7 +76,7 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 						For:      "new_password",
 						HasError: errs["new_password"] != "",
 					}) {
-						New password 
+						New password
 					}
 					@inputc.Input(inputc.InputArgs{
 						Type:       "password",
@@ -82,7 +95,7 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 						For:      "confirm_password",
 						HasError: errs["confirm_password"] != "",
 					}) {
-						Confirm new password 
+						Confirm new password
 					}
 					@inputc.Input(inputc.InputArgs{
 						Type:       "password",
@@ -101,7 +114,7 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 						Type:    "submit",
 						Variant: "default",
 					}) {
-						Update Password 
+						Update Password
 					}
 				</div>
 			}
@@ -111,7 +124,7 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 
 // ProfilePage composes BaseLayout + ProfileContent for initial load.
 templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string) {
-	@BaseLayout(basePath, title, true, csrf) {
+	@layouts.Root(basePath, title, true, csrf) {
 		@ProfileContent(basePath, csrf, errs, username, success)
 	}
 }

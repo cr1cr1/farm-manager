@@ -1,9 +1,10 @@
 package pages
 
 import (
-	buttonc "github.com/cr1cr1/farm-manager/internal/web/templates/components/button"
-	formc "github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
-	inputc "github.com/cr1cr1/farm-manager/internal/web/templates/components/input"
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
 )
 
 // LoginContent is the fragment (no layout) containing the login form.
@@ -23,7 +24,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 					For:      "username",
 					HasError: errs["username"] != "",
 				}) {
-					Username 
+					Username
 				}
 				@inputc.Input(inputc.InputArgs{
 					Type: "text",
@@ -44,7 +45,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 					For:      "password",
 					HasError: errs["password"] != "",
 				}) {
-					Password 
+					Password
 				}
 				@inputc.Input(inputc.InputArgs{
 					Type:       "password",
@@ -62,7 +63,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 					Type:    "submit",
 					Variant: "default",
 				}) {
-					Login 
+					Login
 				}
 			</div>
 		}
@@ -71,7 +72,7 @@ templ LoginContent(basePath string, csrf string, errs map[string]string, usernam
 
 // LoginPage composes BaseLayout + LoginContent for initial full-page load (no nav).
 templ LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) {
-	@BaseLayout(basePath, title, false, csrf) {
+	@layouts.Root(basePath, title, false, csrf) {
 		@LoginContent(basePath, csrf, errs, username)
 	}
 }

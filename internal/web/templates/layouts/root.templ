@@ -1,0 +1,99 @@
+package layouts
+
+import (
+	themetoggle "github.com/coreycole/datastarui/components/themetoggle"
+	"time"
+)
+
+// Root provides the shared HTML skeleton.
+templ Root(basePath string, title string, showNav bool, csrf string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/public/css/app.css"/>
+			<!-- Theme initialization: set early to avoid flash -->
+			<script>
+			// initTheme returns the initial theme string and applies the dark class
+			function initTheme(){
+				try{
+					var stored = localStorage.getItem('theme');
+					if(stored && (stored === 'light' || stored === 'dark' || stored === 'system')){
+						if(stored === 'dark') document.documentElement.classList.add('dark');
+						if(stored === 'light') document.documentElement.classList.remove('dark');
+						if(stored === 'system') {
+							if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+								document.documentElement.classList.add('dark');
+							} else {
+								document.documentElement.classList.remove('dark');
+							}
+						}
+						return stored;
+					}
+					// default to system
+					var theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+					if(theme === 'dark') document.documentElement.classList.add('dark');
+					return 'system';
+				}catch(e){ return 'system'; }
+			}
+			</script>
+		</head>
+		<body class="min-h-screen bg-background font-sans antialiased" data-signals="{theme: initTheme()}">
+			<div class="relative flex min-h-screen flex-col bg-background">
+				<div data-wrapper="" class="border-grid flex flex-1 flex-col">
+					<!-- Header -->
+					<header class="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+						<div class="container-wrapper">
+							<div class="container h-14 flex flex-row items-center justify-between">
+								<div class="flex flex-row items-center gap-3">
+									<a class="flex items-center no-underline pb-[0.5px]" href={ basePath }>
+										<span class="font-semibold text-foreground inline-flex items-center">Farm Manager</span>
+									</a>
+									if showNav {
+										<nav class="hidden md:flex items-center gap-4 text-sm lg:gap-6 [&_a]:no-underline ml-6">
+											<a class="transition-colors hover:text-foreground/80 text-muted-foreground" href={ basePath }>
+												Dashboard
+											</a>
+											<a class="transition-colors hover:text-foreground/80 text-muted-foreground" href={ basePath + "/profile" }>
+												Profile
+											</a>
+										</nav>
+									}
+								</div>
+								<div class="flex items-center space-x-2">
+									<nav class="flex items-center space-x-1">
+										@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{Class: "btn-ghost"})
+									</nav>
+									if showNav {
+										<form method="post" action={ basePath + "/logout" } class="logout-form">
+											<input type="hidden" name="csrf_token" value={ csrf }/>
+											<button type="submit" class="btn btn-secondary">Logout</button>
+										</form>
+									}
+								</div>
+							</div>
+						</div>
+					</header>
+					<main class="flex flex-1 flex-col">
+						<div class="container-wrapper flex flex-1">
+							<div class="container mx-auto px-4 py-6 md:px-8">
+								{ children... }
+							</div>
+						</div>
+					</main>
+					<footer class="footer border-t bg-background/95">
+						<div class="container-wrapper">
+							<div class="container px-4 py-4">
+								<p class="text-sm text-muted-foreground">&copy; { time.Now().Year() } Farm Manager</p>
+							</div>
+						</div>
+					</footer>
+				</div>
+			</div>
+			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
+			<script src="/public/js/app.js"></script>
+		</body>
+	</html>
+}
