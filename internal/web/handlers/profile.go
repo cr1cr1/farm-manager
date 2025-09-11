@@ -85,8 +85,14 @@ func (p *Profile) PasswordPost(r *ghttp.Request) {
 		}
 	}
 
-	csrf := middleware.HiddenCsrfFieldValue(r)
-	component := pages.ProfilePage(middleware.BasePath(), "Profile", csrf, errs, username, success)
 	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_ = component.Render(r.GetCtx(), r.Response.Writer)
+	frag := pages.ProfileAlertFragment(
+		success,
+		errs["form"],
+		errs["current_password"],
+		errs["new_password"],
+		errs["confirm_password"],
+		"profile_password_form",
+	)
+	_ = frag.Render(r.GetCtx(), r.Response.Writer)
 }

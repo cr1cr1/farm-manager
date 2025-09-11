@@ -1,5 +1,12 @@
 package pages
 
+import (
+	buttonc "github.com/cr1cr1/farm-manager/internal/web/templates/components/button"
+	formc "github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	inputc "github.com/cr1cr1/farm-manager/internal/web/templates/components/input"
+	utilsc "github.com/cr1cr1/farm-manager/internal/web/templates/components/utils"
+)
+
 templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -8,8 +15,6 @@ templ ProfilePage(basePath string, title string, csrf string, errs map[string]st
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
 			<title>{ title }</title>
 			<link rel="stylesheet" href="/public/css/app.css"/>
-			<!-- datastarUI (via CDN). See https://github.com/CoreyCole/datastarui -->
-			<!-- Adjust if a specific CSS/JS bundle is desired. -->
 		</head>
 		<body class="container">
 			<header class="header">
@@ -27,42 +32,102 @@ templ ProfilePage(basePath string, title string, csrf string, errs map[string]st
 				<section class="card">
 					<h2>User Profile</h2>
 					<p><strong>Username:</strong> { username }</p>
-					if success != "" {
-						<div class="alert alert-success">{ success }</div>
-					}
-					if errs["form"] != "" {
-						<div class="alert alert-danger">{ errs["form"] }</div>
-					}
 				</section>
 				<section class="card">
-					<h3>Change Password</h3>
-					<form method="post" action={ basePath + "/profile/password" } class="ds-form">
-						<input type="hidden" name="csrf_token" value={ csrf }/>
-						<div class="form-row">
-							<label for="current_password" class="ds-label">Current password</label>
-							<input id="current_password" name="current_password" type="password" class="ds-input" autocomplete="current-password"/>
-							if errs["current_password"] != "" {
-								<div class="field-error">{ errs["current_password"] }</div>
+					{{
+						signals := utilsc.Signals("profile_password_form", map[string]string{
+							"current_password": "",
+							"new_password":     "",
+							"confirm_password": "",
+						})
+					}}
+					<div data-signals={ signals.DataSignals }>
+						<h3>Change Password</h3>
+						<section id="profile-alert">
+							if success != "" {
+								<div class="alert alert-success">{ success }</div>
 							}
-						</div>
-						<div class="form-row">
-							<label for="new_password" class="ds-label">New password</label>
-							<input id="new_password" name="new_password" type="password" class="ds-input" autocomplete="new-password"/>
-							if errs["new_password"] != "" {
-								<div class="field-error">{ errs["new_password"] }</div>
+							if errs["form"] != "" {
+								<div class="alert alert-danger">{ errs["form"] }</div>
 							}
-						</div>
-						<div class="form-row">
-							<label for="confirm_password" class="ds-label">Confirm new password</label>
-							<input id="confirm_password" name="confirm_password" type="password" class="ds-input" autocomplete="new-password"/>
-							if errs["confirm_password"] != "" {
-								<div class="field-error">{ errs["confirm_password"] }</div>
+						</section>
+						@formc.Form(formc.FormArgs{
+							// Use a different HTML id so the inner wrapper doesn't shadow the parent signals
+							ID:     "profile_password_form_form",
+							Action: basePath + "/profile/password",
+							// DatastarUI Form will add data-on-submit="@post(...)" and honor data-target for morphing
+							Attributes: templ.Attributes{
+								"data-target": "profile-alert",
+							},
+						}) {
+							<input type="hidden" name="csrf_token" value={ csrf }/>
+							@formc.FormItem(formc.FormItemArgs{}) {
+								@formc.FormLabel(formc.FormLabelArgs{
+									For:      "current_password",
+									HasError: errs["current_password"] != "",
+								}) {
+									Current password
+								}
+								@inputc.Input(inputc.InputArgs{
+									Type:       "password",
+									ID:         "current_password",
+									Name:       "current_password",
+									FormID:     "profile_password_form",
+									Attributes: templ.Attributes{"autocomplete": "current-password"},
+								})
+								@formc.FormMessage(formc.FormMessageArgs{
+									ID:      "msg-current_password",
+									Message: errs["current_password"],
+								})
 							}
-						</div>
-						<div class="actions">
-							<button type="submit" class="btn btn-primary ds-button">Update Password</button>
-						</div>
-					</form>
+							@formc.FormItem(formc.FormItemArgs{}) {
+								@formc.FormLabel(formc.FormLabelArgs{
+									For:      "new_password",
+									HasError: errs["new_password"] != "",
+								}) {
+									New password
+								}
+								@inputc.Input(inputc.InputArgs{
+									Type:       "password",
+									ID:         "new_password",
+									Name:       "new_password",
+									FormID:     "profile_password_form",
+									Attributes: templ.Attributes{"autocomplete": "new-password"},
+								})
+								@formc.FormMessage(formc.FormMessageArgs{
+									ID:      "msg-new_password",
+									Message: errs["new_password"],
+								})
+							}
+							@formc.FormItem(formc.FormItemArgs{}) {
+								@formc.FormLabel(formc.FormLabelArgs{
+									For:      "confirm_password",
+									HasError: errs["confirm_password"] != "",
+								}) {
+									Confirm new password
+								}
+								@inputc.Input(inputc.InputArgs{
+									Type:       "password",
+									ID:         "confirm_password",
+									Name:       "confirm_password",
+									FormID:     "profile_password_form",
+									Attributes: templ.Attributes{"autocomplete": "new-password"},
+								})
+								@formc.FormMessage(formc.FormMessageArgs{
+									ID:      "msg-confirm_password",
+									Message: errs["confirm_password"],
+								})
+							}
+							<div class="actions">
+								@buttonc.Button(buttonc.ButtonArgs{
+									Type:    "submit",
+									Variant: "default",
+								}) {
+									Update Password
+								}
+							</div>
+						}
+					</div>
 				</section>
 			</main>
 			<footer class="footer">

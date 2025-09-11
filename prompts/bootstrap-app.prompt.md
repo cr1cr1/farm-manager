@@ -45,7 +45,7 @@ Routing and auth (hypermedia, no REST)
 Hypermedia (HATEOAS) with DataStar/DatastarUI
 
 - Use DataStar and DatastarUI (https://github.com/coreycole/datastarui) declaratively to drive navigation and actions:
-  - DatastarUI components are not a javascript library, rather a collection of templ files using datastar library to drive UI interactions.
+  - DatastarUI components are not a javascript library, rather a collection of templ files using datastar library to drive UI interactions. You will git clone the repo in local `tmp/` and copy the components needed to `internal/web/templates/components`
   - Links and buttons include attributes to fetch server-rendered HTML and swap into a target element (e.g., main content area).
   - Forms submit with CSRF token; server responds with full page or partial fragment; client swaps accordingly.
   - Avoid bespoke JSON endpoints; favor standard HTTP verbs returning HTML snippets.
