@@ -10,6 +10,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o
 FROM gcr.io/distroless/static-debian12
 WORKDIR /
 COPY --from=builder /out/farm-manager /farm-manager
-EXPOSE 8080
+EXPOSE 3000
 USER nonroot:nonroot
 ENTRYPOINT ["/farm-manager"]
