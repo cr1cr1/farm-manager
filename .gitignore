@@ -4,6 +4,7 @@
 /data/
 /dist/
 /tmp/
+node_modules/
 coverage*
 *.log
 
