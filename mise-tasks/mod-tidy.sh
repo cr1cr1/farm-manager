@@ -5,4 +5,4 @@
 #MISE outputs=["go.mod","go.sum"]
 set -euo pipefail
 go mod tidy
-# go mod vendor # Uncomment if you want to use vendoring
+go mod vendor

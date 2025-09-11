@@ -162,7 +162,7 @@ goreleaser release --snapshot --clean
 #MISE outputs=["go.mod","go.sum"]
 set -euo pipefail
 go mod tidy
-# go mod vendor # Uncomment if you want to use vendoring
+go mod vendor
 ```
 
 11) mise-tasks/build/container.sh
@@ -189,7 +189,7 @@ set -euo pipefail
 
 [[ -f pnpm-lock.yaml ]] || pnpm install
 set -x
-pnpm exec tailwindcss -i app.css -o public/css/app.css --content "./internal/web/**/*" --content "./cmd/**/*"
+pnpm exec tailwindcss -i app.css -o public/css/app.css --content "./internal/web/**/*" --content "./cmd/**/*" --content "./vendor/github.com/coreycole/datastarui/**/*" --minify
 ```
 
 13) .goreleaser.yaml
