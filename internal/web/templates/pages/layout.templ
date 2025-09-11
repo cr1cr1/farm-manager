@@ -1,0 +1,39 @@
+package pages
+
+// BaseLayout provides the shared HTML skeleton.
+// children supply the main content.
+// showNav indicates authenticated pages (shows nav + logout form).
+templ BaseLayout(basePath string, title string, showNav bool, csrf string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/public/css/app.css"/>
+		</head>
+		<body class="container">
+			<header class="header">
+				<h1>Farm Manager</h1>
+				if showNav {
+					<nav class="nav">
+						<a href={ basePath }>Dashboard</a>
+						<a href={ basePath + "/profile" }>Profile</a>
+					</nav>
+					<form method="post" action={ basePath + "/logout" } class="logout-form">
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+						<button type="submit" class="btn btn-secondary">Logout</button>
+					</form>
+				}
+			</header>
+			<main>
+				{ children... }
+			</main>
+			<footer class="footer">
+				<p>&copy; { YearNow() } Farm Manager</p>
+			</footer>
+			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
+			<script src="/public/js/app.js"></script>
+		</body>
+	</html>
+}

@@ -1,7 +1,7 @@
 package pages
 
 templ ProfileAlertFragment(success string, formErr string, currentErr string, newErr string, confirmErr string, sanitizedFormID string) {
-	<section id="profile-alert" class="card">
+	<section id="profile-alert">
 		if success != "" {
 			<div class="alert alert-success">{ success }</div>
 		}

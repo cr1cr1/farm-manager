@@ -7,134 +7,111 @@ import (
 	utilsc "github.com/cr1cr1/farm-manager/internal/web/templates/components/utils"
 )
 
+// ProfileContent is the fragment (no layout) for the profile page main area.
+templ ProfileContent(basePath string, csrf string, errs map[string]string, username string, success string) {
+	<section class="card">
+		<h2>User Profile</h2>
+		<p><strong>Username:</strong> { username }</p>
+	</section>
+	<section class="card">
+		{{
+			signals := utilsc.Signals("profile_password_form", map[string]string{
+				"current_password": "",
+				"new_password":     "",
+				"confirm_password": "",
+			})
+		}}
+		<div data-signals={ signals.DataSignals }>
+			<h3>Change Password</h3>
+			<section id="profile-alert">
+				if success != "" {
+					<div class="alert alert-success">{ success }</div>
+				}
+				if errs["form"] != "" {
+					<div class="alert alert-danger">{ errs["form"] }</div>
+				}
+			</section>
+			@formc.Form(formc.FormArgs{
+				ID:     "profile_password_form_form",
+				Action: basePath + "/profile/password",
+				Attributes: templ.Attributes{
+					"data-target": "profile-alert",
+				},
+			}) {
+				<input type="hidden" name="csrf_token" value={ csrf }/>
+				@formc.FormItem(formc.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For:      "current_password",
+						HasError: errs["current_password"] != "",
+					}) {
+						Current password 
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:       "password",
+						ID:         "current_password",
+						Name:       "current_password",
+						FormID:     "profile_password_form",
+						Attributes: templ.Attributes{"autocomplete": "current-password"},
+					})
+					@formc.FormMessage(formc.FormMessageArgs{
+						ID:      "msg-current_password",
+						Message: errs["current_password"],
+					})
+				}
+				@formc.FormItem(formc.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For:      "new_password",
+						HasError: errs["new_password"] != "",
+					}) {
+						New password 
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:       "password",
+						ID:         "new_password",
+						Name:       "new_password",
+						FormID:     "profile_password_form",
+						Attributes: templ.Attributes{"autocomplete": "new-password"},
+					})
+					@formc.FormMessage(formc.FormMessageArgs{
+						ID:      "msg-new_password",
+						Message: errs["new_password"],
+					})
+				}
+				@formc.FormItem(formc.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For:      "confirm_password",
+						HasError: errs["confirm_password"] != "",
+					}) {
+						Confirm new password 
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:       "password",
+						ID:         "confirm_password",
+						Name:       "confirm_password",
+						FormID:     "profile_password_form",
+						Attributes: templ.Attributes{"autocomplete": "new-password"},
+					})
+					@formc.FormMessage(formc.FormMessageArgs{
+						ID:      "msg-confirm_password",
+						Message: errs["confirm_password"],
+					})
+				}
+				<div class="actions">
+					@buttonc.Button(buttonc.ButtonArgs{
+						Type:    "submit",
+						Variant: "default",
+					}) {
+						Update Password 
+					}
+				</div>
+			}
+		</div>
+	</section>
+}
+
+// ProfilePage composes BaseLayout + ProfileContent for initial load.
 templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="utf-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title }</title>
-			<link rel="stylesheet" href="/public/css/app.css"/>
-		</head>
-		<body class="container">
-			<header class="header">
-				<h1>Farm Manager</h1>
-				<nav class="nav">
-					<a href={ basePath }>Dashboard</a>
-					<a href={ basePath + "/profile" } class="active">Profile</a>
-				</nav>
-				<form method="post" action={ basePath + "/logout" } class="logout-form">
-					<input type="hidden" name="csrf_token" value={ csrf }/>
-					<button type="submit" class="btn btn-secondary">Logout</button>
-				</form>
-			</header>
-			<main>
-				<section class="card">
-					<h2>User Profile</h2>
-					<p><strong>Username:</strong> { username }</p>
-				</section>
-				<section class="card">
-					{{
-						signals := utilsc.Signals("profile_password_form", map[string]string{
-							"current_password": "",
-							"new_password":     "",
-							"confirm_password": "",
-						})
-					}}
-					<div data-signals={ signals.DataSignals }>
-						<h3>Change Password</h3>
-						<section id="profile-alert">
-							if success != "" {
-								<div class="alert alert-success">{ success }</div>
-							}
-							if errs["form"] != "" {
-								<div class="alert alert-danger">{ errs["form"] }</div>
-							}
-						</section>
-						@formc.Form(formc.FormArgs{
-							// Use a different HTML id so the inner wrapper doesn't shadow the parent signals
-							ID:     "profile_password_form_form",
-							Action: basePath + "/profile/password",
-							// DatastarUI Form will add data-on-submit="@post(...)" and honor data-target for morphing
-							Attributes: templ.Attributes{
-								"data-target": "profile-alert",
-							},
-						}) {
-							<input type="hidden" name="csrf_token" value={ csrf }/>
-							@formc.FormItem(formc.FormItemArgs{}) {
-								@formc.FormLabel(formc.FormLabelArgs{
-									For:      "current_password",
-									HasError: errs["current_password"] != "",
-								}) {
-									Current password
-								}
-								@inputc.Input(inputc.InputArgs{
-									Type:       "password",
-									ID:         "current_password",
-									Name:       "current_password",
-									FormID:     "profile_password_form",
-									Attributes: templ.Attributes{"autocomplete": "current-password"},
-								})
-								@formc.FormMessage(formc.FormMessageArgs{
-									ID:      "msg-current_password",
-									Message: errs["current_password"],
-								})
-							}
-							@formc.FormItem(formc.FormItemArgs{}) {
-								@formc.FormLabel(formc.FormLabelArgs{
-									For:      "new_password",
-									HasError: errs["new_password"] != "",
-								}) {
-									New password
-								}
-								@inputc.Input(inputc.InputArgs{
-									Type:       "password",
-									ID:         "new_password",
-									Name:       "new_password",
-									FormID:     "profile_password_form",
-									Attributes: templ.Attributes{"autocomplete": "new-password"},
-								})
-								@formc.FormMessage(formc.FormMessageArgs{
-									ID:      "msg-new_password",
-									Message: errs["new_password"],
-								})
-							}
-							@formc.FormItem(formc.FormItemArgs{}) {
-								@formc.FormLabel(formc.FormLabelArgs{
-									For:      "confirm_password",
-									HasError: errs["confirm_password"] != "",
-								}) {
-									Confirm new password
-								}
-								@inputc.Input(inputc.InputArgs{
-									Type:       "password",
-									ID:         "confirm_password",
-									Name:       "confirm_password",
-									FormID:     "profile_password_form",
-									Attributes: templ.Attributes{"autocomplete": "new-password"},
-								})
-								@formc.FormMessage(formc.FormMessageArgs{
-									ID:      "msg-confirm_password",
-									Message: errs["confirm_password"],
-								})
-							}
-							<div class="actions">
-								@buttonc.Button(buttonc.ButtonArgs{
-									Type:    "submit",
-									Variant: "default",
-								}) {
-									Update Password
-								}
-							</div>
-						}
-					</div>
-				</section>
-			</main>
-			<footer class="footer">
-				<p>&copy; { YearNow() } Farm Manager</p>
-			</footer>
-			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
-			<script src="/public/js/app.js"></script>
-		</body>
-	</html>
+	@BaseLayout(basePath, title, true, csrf) {
+		@ProfileContent(basePath, csrf, errs, username, success)
+	}
 }

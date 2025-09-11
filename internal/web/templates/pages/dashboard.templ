@@ -1,49 +1,29 @@
 package pages
 
+// DashboardContent supplies the dashboard inner content (no layout wrapper).
+// Intended to be passed as children to BaseLayout.
+templ DashboardContent(basePath string, csrf string) {
+	<section class="card">
+		<h2>Dashboard</h2>
+		<p>This is a blank dashboard placeholder.</p>
+		<div class="actions">
+			<a
+				class="btn btn-primary"
+				href={ basePath + "/fragment/ping" }
+				data-on-click="@get(el.getAttribute('href')); evt.preventDefault();"
+			>
+				Load Fragment (Ping)
+			</a>
+		</div>
+	</section>
+	<section id="content" class="card">
+		<p>Fragment target area.</p>
+	</section>
+}
+
+// DashboardPage composes the layout + content for initial full-page load.
 templ DashboardPage(basePath string, title string, csrf string) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="utf-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title }</title>
-			<link rel="stylesheet" href="/public/css/app.css"/>
-		</head>
-		<body class="container">
-			<header class="header">
-				<h1>Farm Manager</h1>
-				<nav class="nav">
-					<a href={ basePath } class="active">Dashboard</a>
-					<a href={ basePath + "/profile" }>Profile</a>
-				</nav>
-				<form method="post" action={ basePath + "/logout" } class="logout-form">
-					<input type="hidden" name="csrf_token" value={ csrf }/>
-					<button type="submit" class="btn btn-secondary">Logout</button>
-				</form>
-			</header>
-			<main>
-				<section class="card">
-					<h2>Dashboard</h2>
-					<p>This is a blank dashboard placeholder.</p>
-					<div class="actions">
-						<a
-							class="btn btn-primary"
-							href={ basePath + "/fragment/ping" }
-							data-on-click="@get(el.getAttribute('href')); evt.preventDefault();"
-						>
-							Load Fragment (Ping)
-						</a>
-					</div>
-				</section>
-				<section id="content" class="card">
-					<p>Fragment target area.</p>
-				</section>
-			</main>
-			<footer class="footer">
-				<p>&copy; { YearNow() } Farm Manager</p>
-			</footer>
-			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
-			<script src="/public/js/app.js"></script>
-		</body>
-	</html>
+	@BaseLayout(basePath, title, true, csrf) {
+		@DashboardContent(basePath, csrf)
+	}
 }

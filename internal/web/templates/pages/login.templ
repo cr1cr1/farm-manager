@@ -1,48 +1,77 @@
 package pages
 
-templ LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="utf-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title }</title>
-			<link rel="stylesheet" href="/public/css/app.css"/>
-		</head>
-		<body class="container">
-			<header class="header">
-				<h1>Farm Manager</h1>
-			</header>
-			<main class="card">
-				<h2>Sign in</h2>
-				if errs["form"] != "" {
-					<div class="alert alert-danger">{ errs["form"] }</div>
+import (
+	buttonc "github.com/cr1cr1/farm-manager/internal/web/templates/components/button"
+	formc "github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	inputc "github.com/cr1cr1/farm-manager/internal/web/templates/components/input"
+)
+
+// LoginContent is the fragment (no layout) containing the login form.
+templ LoginContent(basePath string, csrf string, errs map[string]string, username string) {
+	<section class="card">
+		<h2>Sign in</h2>
+		if errs["form"] != "" {
+			<div class="alert alert-danger">{ errs["form"] }</div>
+		}
+		@formc.Form(formc.FormArgs{
+			ID:     "login_form",
+			Action: basePath + "/login",
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			@formc.FormItem(formc.FormItemArgs{}) {
+				@formc.FormLabel(formc.FormLabelArgs{
+					For:      "username",
+					HasError: errs["username"] != "",
+				}) {
+					Username 
 				}
-				<form method="post" action={ basePath + "/login" }>
-					<input type="hidden" name="csrf_token" value={ csrf }/>
-					<div class="form-row">
-						<label for="username">Username</label>
-						<input id="username" name="username" type="text" value={ username } autocomplete="username"/>
-						if errs["username"] != "" {
-							<div class="field-error">{ errs["username"] }</div>
-						}
-					</div>
-					<div class="form-row">
-						<label for="password">Password</label>
-						<input id="password" name="password" type="password" autocomplete="current-password"/>
-						if errs["password"] != "" {
-							<div class="field-error">{ errs["password"] }</div>
-						}
-					</div>
-					<div class="actions">
-						<button type="submit" class="btn btn-primary">Login</button>
-					</div>
-				</form>
-			</main>
-			<footer class="footer">
-				<p>&copy; { YearNow() } Farm Manager</p>
-			</footer>
-			<script src="/public/js/app.js"></script>
-		</body>
-	</html>
+				@inputc.Input(inputc.InputArgs{
+					Type: "text",
+					ID:   "username",
+					Name: "username",
+					Attributes: templ.Attributes{
+						"autocomplete": "username",
+						"value":        username,
+					},
+				})
+				@formc.FormMessage(formc.FormMessageArgs{
+					ID:      "msg-username",
+					Message: errs["username"],
+				})
+			}
+			@formc.FormItem(formc.FormItemArgs{}) {
+				@formc.FormLabel(formc.FormLabelArgs{
+					For:      "password",
+					HasError: errs["password"] != "",
+				}) {
+					Password 
+				}
+				@inputc.Input(inputc.InputArgs{
+					Type:       "password",
+					ID:         "password",
+					Name:       "password",
+					Attributes: templ.Attributes{"autocomplete": "current-password"},
+				})
+				@formc.FormMessage(formc.FormMessageArgs{
+					ID:      "msg-password",
+					Message: errs["password"],
+				})
+			}
+			<div class="actions">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Login 
+				}
+			</div>
+		}
+	</section>
+}
+
+// LoginPage composes BaseLayout + LoginContent for initial full-page load (no nav).
+templ LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) {
+	@BaseLayout(basePath, title, false, csrf) {
+		@LoginContent(basePath, csrf, errs, username)
+	}
 }
