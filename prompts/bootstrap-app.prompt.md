@@ -18,7 +18,7 @@ Tech stack
 
 Environment variables
 
-- PORT: HTTP port (default 8080).
+- PORT: HTTP port (default 3000).
 - APP_BASE_PATH: /app (default /app).
 - SQLITE_DSN: file:./data/app.db?cache=shared&mode=rwc
 - SESSION_SECRET: 32+ bytes secret for session encryption/signing.

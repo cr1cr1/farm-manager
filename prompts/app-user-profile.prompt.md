@@ -109,7 +109,9 @@ Security
 - Ensure CSRF token present and validated.
 
 Acceptance criteria
-- GET /app/profile shows username and password form when authenticated.
+- GET /app/profile shows:
+  - username and password form when authenticated.
+  - option to change theme: light/dark/system.
 - POST /app/profile/password:
   - Wrong current password → form error.
   - Password < 8 → new_password error.

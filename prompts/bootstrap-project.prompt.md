@@ -9,7 +9,7 @@ Follow 12-factor app principles:
 Project metadata
 - Module path: github.com/cr1cr1/farm-manager
 - Go version: 1.25
-- Default HTTP port: 8080
+- Default HTTP port: 3000
 
 Deliverables
 Generate the following files with exact contents, creating directories as needed.
@@ -41,7 +41,7 @@ func addrFromEnv() string {
 	if p := os.Getenv("PORT"); p != "" {
 		return ":" + p
 	}
-	return ":8080"
+	return ":3000"
 }
 
 func main() {
@@ -72,16 +72,16 @@ goreleaser = "latest"
 ubi = "latest"
 "ubi:bokwoon95/wgo" = "latest"
 "aqua:a-h/templ" = "latest"
+pnpm = "latest"
 ```
 
 4) mise-tasks/lint.sh
 ```bash
 #!/usr/bin/env bash
 #MISE description="Static analysis and linting"
-#MISE short="lint"
+#MISE alias="l"
 #MISE sources=["go.mod","**/*.go",".golangci.yaml"]
 set -euo pipefail
-golangci-lint version >/dev/null 2>&1 || true
 go vet ./...
 golangci-lint run ./...
 ```
@@ -90,7 +90,6 @@ golangci-lint run ./...
 ```bash
 #!/usr/bin/env bash
 #MISE description="Unit tests with race and coverage"
-#MISE short="test"
 #MISE sources=["go.mod","**/*.go"]
 set -euo pipefail
 mkdir -p ./.artifacts
@@ -101,7 +100,7 @@ CGO_ENABLED=1 go test ./... -race -covermode=atomic -coverprofile=./.artifacts/c
 ```bash
 #!/usr/bin/env bash
 #MISE description="Build binary to bin/farm-manager"
-#MISE short="build"
+#MISE alias="bp"
 #MISE env={CGO_ENABLED="0"}
 #MISE sources=["go.mod","**/*.go"]
 #MISE outputs=["bin/farm-manager"]
@@ -115,7 +114,7 @@ GOFLAGS="-trimpath" CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${VER
 ```bash
 #!/usr/bin/env bash
 #MISE description="Run the application locally with hot reloading (wgo + templ generate)"
-#MISE short="run"
+#MISE alias="r"
 #MISE sources=["**/*.go","**/*.templ","go.mod","go.sum"]
 set -euo pipefail
 
@@ -123,13 +122,13 @@ set -euo pipefail
 # - watcher A: watches only .templ and runs templ generate
 # - watcher B: watches only .go/go.mod/go.sum and restarts the app
 # We also generate once before starting.
-templ generate
+mise run templ
 
 # Ensure both watchers are terminated when the script exits.
 trap 'kill 0' EXIT
 
 # Watch templ files and regenerate on change (no app restart here).
-wgo -file=.templ templ generate &
+wgo -file=.templ -file=./app.css mise run templ :: mise run build:tailwind &
 
 # Watch Go files and restart the app on change.
 wgo -file=.go -file=go.mod -file=go.sum go run ./cmd/farm-manager
@@ -139,7 +138,7 @@ wgo -file=.go -file=go.mod -file=go.sum go run ./cmd/farm-manager
 ```bash
 #!/usr/bin/env bash
 #MISE description="Generate code from .templ files"
-#MISE short="templ"
+#MISE alias="t"
 #MISE sources=["**/*.templ"]
 set -euo pipefail
 templ generate ./...
@@ -149,7 +148,7 @@ templ generate ./...
 ```bash
 #!/usr/bin/env bash
 #MISE description="Create a local snapshot release using GoReleaser"
-#MISE short="release-snapshot"
+#MISE alias="rs"
 set -euo pipefail
 goreleaser release --snapshot --clean
 ```
@@ -158,7 +157,7 @@ goreleaser release --snapshot --clean
 ```bash
 #!/usr/bin/env bash
 #MISE description="Tidy go.mod and go.sum"
-#MISE short="mod-tidy"
+#MISE alias="mt"
 #MISE sources=["go.mod","go.sum"]
 #MISE outputs=["go.mod","go.sum"]
 set -euo pipefail
@@ -170,7 +169,7 @@ go mod tidy
 ```bash
 #!/usr/bin/env bash
 #MISE description="Build local container image tagged with project name"
-#MISE short="build:container"
+#MISE alias="bc"
 #MISE sources=["Dockerfile","go.mod","go.sum","**/*.go","**/*.templ"]
 set -euo pipefail
 IMAGE="${IMAGE:-farm-manager}"
@@ -180,7 +179,20 @@ docker build -t "${IMAGE}:${TAG}" .
 docker image ls "${IMAGE}:${TAG}"
 ```
 
-10) .goreleaser.yaml
+12) mise-tasks/build/tailwind.sh
+```bash
+#!/usr/bin/env bash
+#MISE description="Build Tailwind CSS"
+#MISE alias="bt"
+#MISE sources=["app.css"]
+set -euo pipefail
+
+[[ -f pnpm-lock.yaml ]] || pnpm install
+set -x
+pnpm exec tailwindcss -i app.css -o public/css/app.css --content "./internal/web/**/*" --content "./cmd/**/*"
+```
+
+13) .goreleaser.yaml
 ```yaml
 version: 2
 
@@ -228,7 +240,7 @@ release:
   prerelease: auto
 ```
 
-11) .github/workflows/release.yml
+14) .github/workflows/release.yml
 ```yaml
 name: Release
 
@@ -304,7 +316,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 ```
 
-12) Dockerfile
+15) Dockerfile
 ```Dockerfile
 # syntax=docker/dockerfile:1
 FROM golang:1.25-alpine AS builder
@@ -318,26 +330,26 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o
 FROM gcr.io/distroless/static-debian12
 WORKDIR /
 COPY --from=builder /out/farm-manager /farm-manager
-EXPOSE 8080
+EXPOSE 3000
 USER nonroot:nonroot
 ENTRYPOINT ["/farm-manager"]
 ```
 
-13) .dockerignore
+16) .dockerignore
 ```gitignore
 .git
 Dockerfile
 README.md
 ```
 
-14) .env.example
-```gitignore
+17) .env.example
+```properties
 # Example environment variables for local development
 # Copy to .env and adjust values as needed (do not commit .env)
-PORT=8080
+PORT=3000
 ```
 
-15) .gitignore
+18) .gitignore
 ```gitignore
 # Binaries and build artifacts
 /bin/
@@ -345,6 +357,7 @@ PORT=8080
 /data/
 /dist/
 /tmp/
+node_modules/
 coverage*
 *.log
 
@@ -355,7 +368,7 @@ coverage*
 .DS_Store
 ```
 
-16) README.dev.md
+19) README.dev.md
 ```markdown
 # farm-manager
 
@@ -373,7 +386,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
 ## Configuration (12-factor)
 
 - Configuration is provided via environment variables.
-- PORT controls the HTTP listen port (default 8080 when unset).
+- PORT controls the HTTP listen port (default 3000 when unset).
 - Do not commit secrets. Use a local .env (not committed) or export in your shell.
 - Example:
 
@@ -389,6 +402,7 @@ Minimal Go 1.25 service using GoFrame, templ, mise task runner, Docker, and GoRe
     mise run mod-tidy
     mise run build:program
     mise run build:container
+    mise run build:tailwind
     mise run run
     mise run release-snapshot
 
@@ -397,12 +411,12 @@ Dev hot reload
 
 ## Docker
 
-    docker build -t farm-manager:local .
-    docker run --rm -e PORT=8080 -p 8080:8080 farm-manager:local
+    mise run build:container
+    docker run --rm -e PORT=3000 -p 3000:3000 farm-manager:local
 
 ## Health check
 
-    curl -sS http://localhost:8080/healthz
+    curl -sS http://localhost:3000/healthz
 
 ## Releasing
 
@@ -415,13 +429,25 @@ Dev hot reload
 
 - For local testing, use: mise run release-snapshot
 ```
+20) package.json (must run `pnpm install` after creating)
+
+```json
+{
+  "name": "farm-manager",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1",
+    "tailwindcss": "^4.1"
+  }
+}
+```
 
 Acceptance criteria
 - Building locally produces bin/farm-manager without CGO.
 - Running locally responds 200 OK on GET /healthz with JSON including status and version metadata.
 - Setting PORT environment variable changes the listen port accordingly.
 - mise run templ, lint, test, build, run, release-snapshot succeed on a clean checkout.
-- Docker image builds and runs, exposing port 8080.
+- Docker image builds and runs, exposing port 3000.
 - Pushing a tag matching v* triggers the GitHub Actions workflow and completes successfully.
 - Tag push builds and pushes a multi-arch image to GHCR with version and latest tags.
 
