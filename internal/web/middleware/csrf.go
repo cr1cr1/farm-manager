@@ -57,11 +57,6 @@ func CsrfToken(r *ghttp.Request) string {
 	return token
 }
 
-// HiddenCsrfFieldValue is a helper for templ pages to inject the hidden input value.
-func HiddenCsrfFieldValue(r *ghttp.Request) string {
-	return CsrfToken(r)
-}
-
 // Csrf is middleware that issues CSRF token cookies on safe methods and validates tokens on mutating methods.
 // Validation passes when either:
 // - Header CsrfHeaderName equals the CSRF cookie value; OR

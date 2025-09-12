@@ -40,14 +40,16 @@ func (h *Auth) LoginGet(r *ghttp.Request) {
 		g.Log().Errorf(r.GetCtx(), "seed admin failed: %v", err)
 	}
 
-	csrf := middleware.HiddenCsrfFieldValue(r)
-	title := "Login"
-	username := ""
-	errs := map[string]string{}
-
-	component := pages.LoginPage(middleware.BasePath(), title, csrf, errs, username)
-	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_ = component.Render(r.GetCtx(), r.Response.Writer)
+	_ = middleware.TemplRender(
+		r,
+		pages.LoginPage(
+			middleware.BasePath(),
+			"Login",
+			middleware.CsrfToken(r),
+			map[string]string{},
+			"",
+		),
+	)
 }
 
 // LoginPost attempts to authenticate and set session. On failure, re-render with errors.
@@ -64,6 +66,8 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 		errs["password"] = "Password is required"
 	}
 
+	isDataStarRequest := r.Header.Get("datastar-request") == "true"
+
 	if len(errs) == 0 {
 		u, err := h.Repo.FindByUsername(r.GetCtx(), username)
 		if err != nil {
@@ -79,15 +83,12 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 				middleware.SetLoggedIn(r, u.Username)
 				middleware.SetNoCache(r)
 
-				// Check if this is a DataStar request
-				isDataStarRequest := r.Header.Get("datastar-request") == "true"
 				if isDataStarRequest {
 					// For DataStar requests, return JavaScript to redirect
 					basePath := middleware.BasePath()
 					js := fmt.Sprintf("window.location.href = %q;", basePath)
 					r.Response.Header().Set("Content-Type", "text/javascript")
-					r.Response.WriteHeader(200)
-					r.Response.Writer.Write([]byte(js))
+					r.Response.Write([]byte(js))
 					return
 				} else {
 					// For regular requests, redirect
@@ -99,11 +100,8 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 		}
 	}
 
-	csrf := middleware.HiddenCsrfFieldValue(r)
+	csrf := middleware.CsrfToken(r)
 	title := "Login"
-
-	// Check if this is a DataStar request (has datastar header)
-	isDataStarRequest := r.Header.Get("datastar-request") == "true"
 
 	var component templ.Component
 	if isDataStarRequest && len(errs) > 0 {
@@ -114,8 +112,7 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 		component = pages.LoginPage(middleware.BasePath(), title, csrf, errs, username)
 	}
 
-	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_ = component.Render(r.GetCtx(), r.Response.Writer)
+	_ = middleware.TemplRender(r, component)
 }
 
 // LogoutPost logs the user out and redirects to /app/login.
