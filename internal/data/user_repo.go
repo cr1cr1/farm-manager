@@ -24,6 +24,8 @@ type UserRepo interface {
 	Create(ctx context.Context, u *domain.User) (int64, error)
 	// UpdatePassword updates the password hash and optionally clears force flag.
 	UpdatePassword(ctx context.Context, userID int64, newHash string, forceChange bool) error
+	// UpdateTheme updates the user's theme preference.
+	UpdateTheme(ctx context.Context, userID int64, theme int) error
 	// SoftDelete marks the user as deleted.
 	SoftDelete(ctx context.Context, userID int64, deletedAt time.Time) error
 }
@@ -47,7 +49,7 @@ func (r *SQLiteUserRepo) Count(ctx context.Context) (int64, error) {
 
 func (r *SQLiteUserRepo) FindByUsername(ctx context.Context, username string) (*domain.User, error) {
 	const q = `
-SELECT id, username, password_hash, force_password_change, created_at, updated_at, deleted_at, created_by, updated_by
+SELECT id, username, password_hash, force_password_change, theme, created_at, updated_at, deleted_at, created_by, updated_by
 FROM users
 WHERE username = ? AND (deleted_at IS NULL)
 LIMIT 1`
@@ -94,6 +96,15 @@ WHERE id = ? AND (deleted_at IS NULL)`
 	return err
 }
 
+func (r *SQLiteUserRepo) UpdateTheme(ctx context.Context, userID int64, theme int) error {
+	const q = `
+UPDATE users
+SET theme = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+WHERE id = ? AND (deleted_at IS NULL)`
+	_, err := r.DB.ExecContext(ctx, q, theme, userID)
+	return err
+}
+
 func (r *SQLiteUserRepo) SoftDelete(ctx context.Context, userID int64, deletedAt time.Time) error {
 	const q = `
 UPDATE users
@@ -113,13 +124,14 @@ func scanUser(rs rowScanner) (*domain.User, error) {
 		username     string
 		passwordHash string
 		force        int
+		theme        int
 		createdAtStr string
 		updatedAtStr string
 		deletedAtStr sql.NullString
 		createdByStr sql.NullString
 		updatedByStr sql.NullString
 	)
-	if err := rs.Scan(&id, &username, &passwordHash, &force, &createdAtStr, &updatedAtStr, &deletedAtStr, &createdByStr, &updatedByStr); err != nil {
+	if err := rs.Scan(&id, &username, &passwordHash, &force, &theme, &createdAtStr, &updatedAtStr, &deletedAtStr, &createdByStr, &updatedByStr); err != nil {
 		return nil, err
 	}
 
@@ -155,6 +167,7 @@ func scanUser(rs rowScanner) (*domain.User, error) {
 		Username:            username,
 		PasswordHash:        passwordHash,
 		ForcePasswordChange: intToBool(force),
+		Theme:               theme,
 		Audit: domain.AuditFields{
 			CreatedAt: createdAt,
 			UpdatedAt: updatedAt,

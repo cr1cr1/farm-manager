@@ -14,7 +14,7 @@ templ DashboardContent(basePath string, csrf string) {
 			<a
 				class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"
 				href={ basePath + "/fragment/ping" }
-				data-on-click="@get(el.getAttribute('href')); evt.preventDefault();"
+				data-on-click="@get(el.getAttribute('href'), '#content'); evt.preventDefault();"
 			>
 				Load Fragment (Ping)
 			</a>

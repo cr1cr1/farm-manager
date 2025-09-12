@@ -17,6 +17,7 @@ type User struct {
 	Username            string
 	PasswordHash        string
 	ForcePasswordChange bool
+	Theme               int // 0 = system, 1 = dark, 2 = light
 	Audit               AuditFields
 }
 

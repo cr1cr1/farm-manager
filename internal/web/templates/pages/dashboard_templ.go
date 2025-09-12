@@ -46,7 +46,7 @@ func DashboardContent(basePath string, csrf string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-on-click=\"@get(el.getAttribute('href')); evt.preventDefault();\">Load Fragment (Ping)</a></div></div><div id=\"content\" class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6\"><p class=\"text-muted-foreground\">Fragment target area.</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-on-click=\"@get(el.getAttribute('href'), '#content'); evt.preventDefault();\">Load Fragment (Ping)</a></div></div><div id=\"content\" class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6\"><p class=\"text-muted-foreground\">Fragment target area.</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

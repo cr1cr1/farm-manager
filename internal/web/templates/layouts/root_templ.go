@@ -74,14 +74,14 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><!-- PWA Manifest --><link rel=\"manifest\" href=\"/public/manifest.json\"><!-- Apple PWA Support --><meta name=\"mobile-web-app-capable\" content=\"yes\"><meta name=\"mobile-web-app-capable-status-bar-style\" content=\"default\"><meta name=\"mobile-web-app-capable-title\" content=\"Farm Manager\"><!-- Apple Touch Icons --><link rel=\"apple-touch-icon\" href=\"/public/img/apple-touch-icon.png\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/public/img/apple-touch-icon.png\"><!-- Popover API Polyfill --><script type=\"module\">\n\t\t\t\tif (!('popover' in HTMLElement.prototype)) {\n\t\t\t\t\tconsole.log('Loading Popover API polyfill...');\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/popover-polyfill@latest\");\n\t\t\t\t}\n\t\t\t</script><!-- CSS Anchor Positioning Polyfill --><script type=\"module\">\n\t\t\t\tif (!(\"anchorName\" in document.documentElement.style)) {\n\t\t\t\t\tconsole.log('🔧 CSS Anchor Positioning is not natively supported');\n\t\t\t\t\tconsole.log('📦 Loading CSS Anchor Positioning polyfill from jsDelivr...');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = true;\n\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/css-anchor-positioning@latest/dist/css-anchor-positioning.js\")\n\t\t\t\t\t\t.then(() => {\n\t\t\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning polyfill loaded successfully!');\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = true;\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\n\t\t\t\t\t\t\t// Dispatch custom event to notify components\n\t\t\t\t\t\t\twindow.dispatchEvent(new CustomEvent('css-anchor-polyfill-loaded'));\n\t\t\t\t\t\t})\n\t\t\t\t\t\t.catch((error) => {\n\t\t\t\t\t\t\tconsole.error('❌ Failed to load CSS Anchor Positioning polyfill:', error);\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\t\t\t\t\t\t});\n\t\t\t\t} else {\n\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning is natively supported - no polyfill needed');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = false;\n\t\t\t\t}\n\t\t\t</script><!-- Theme initialization --><script>\n\t\t\t\t// Initialize theme from localStorage or system preference\n\t\t\t\tfunction initTheme() {\n\t\t\t\t\tconst theme = localStorage.getItem('theme') ||\n\t\t\t\t\t\t(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');\n\t\t\t\t\tdocument.documentElement.classList.toggle('dark', theme === 'dark');\n\t\t\t\t\treturn theme;\n\t\t\t\t}\n\n\t\t\t\t// Set initial theme before page renders\n\t\t\t\tinitTheme();\n\t\t\t</script><!-- Enable View Transitions API --><meta name=\"view-transition\" content=\"same-origin\"></head><body class=\"min-h-screen bg-background font-sans antialiased\" data-signals=\"{theme: initTheme()}\"><div class=\"relative flex min-h-screen flex-col bg-background\"><div data-wrapper=\"\" class=\"border-grid flex flex-1 flex-col\"><!-- Header --><header class=\"border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60\"><div class=\"container-wrapper\"><div class=\"container h-14 flex flex-row items-center justify-between\"><div class=\"flex flex-row items-center gap-3\"><a class=\"flex items-center no-underline pb-[0.5px]\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><link rel=\"icon\" type=\"image/x-icon\" href=\"/public/img/favicon.ico\"><!-- PWA Manifest --><link rel=\"manifest\" href=\"/public/manifest.json\"><!-- Apple PWA Support --><meta name=\"mobile-web-app-capable\" content=\"yes\"><meta name=\"mobile-web-app-capable-status-bar-style\" content=\"default\"><meta name=\"mobile-web-app-capable-title\" content=\"Farm Manager\"><!-- Apple Touch Icons --><link rel=\"apple-touch-icon\" href=\"/public/img/apple-touch-icon.png\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/public/img/apple-touch-icon.png\"><!-- Popover API Polyfill --><script type=\"module\">\n\t\t\t\tif (!('popover' in HTMLElement.prototype)) {\n\t\t\t\t\tconsole.log('Loading Popover API polyfill...');\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/popover-polyfill@latest\");\n\t\t\t\t}\n\t\t\t</script><!-- CSS Anchor Positioning Polyfill --><script type=\"module\">\n\t\t\t\tif (!(\"anchorName\" in document.documentElement.style)) {\n\t\t\t\t\tconsole.log('🔧 CSS Anchor Positioning is not natively supported');\n\t\t\t\t\tconsole.log('📦 Loading CSS Anchor Positioning polyfill from jsDelivr...');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = true;\n\n\t\t\t\t\timport(\"https://cdn.jsdelivr.net/npm/@oddbird/css-anchor-positioning@latest/dist/css-anchor-positioning.js\")\n\t\t\t\t\t\t.then(() => {\n\t\t\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning polyfill loaded successfully!');\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = true;\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\n\t\t\t\t\t\t\t// Dispatch custom event to notify components\n\t\t\t\t\t\t\twindow.dispatchEvent(new CustomEvent('css-anchor-polyfill-loaded'));\n\t\t\t\t\t\t})\n\t\t\t\t\t\t.catch((error) => {\n\t\t\t\t\t\t\tconsole.error('❌ Failed to load CSS Anchor Positioning polyfill:', error);\n\t\t\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADING = false;\n\t\t\t\t\t\t});\n\t\t\t\t} else {\n\t\t\t\t\tconsole.log('✅ CSS Anchor Positioning is natively supported - no polyfill needed');\n\t\t\t\t\twindow.CSS_ANCHOR_POLYFILL_LOADED = false;\n\t\t\t\t}\n\t\t\t</script><!-- Theme initialization --><script>\n\t\t\t\t// Initialize theme from localStorage or system preference\n\t\t\t\tfunction initTheme() {\n\t\t\t\t\tconst theme = localStorage.getItem('theme') ||\n\t\t\t\t\t\t(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');\n\t\t\t\t\tdocument.documentElement.classList.toggle('dark', theme === 'dark');\n\t\t\t\t\treturn theme;\n\t\t\t\t}\n\n\t\t\t\t// Set initial theme before page renders\n\t\t\t\tinitTheme();\n\t\t\t</script><!-- Enable View Transitions API --><meta name=\"view-transition\" content=\"same-origin\"></head><body class=\"min-h-screen bg-background font-sans antialiased\" data-signals=\"{theme: initTheme()}\"><div class=\"relative flex min-h-screen flex-col bg-background\"><div data-wrapper=\"\" class=\"border-grid flex flex-1 flex-col\"><!-- Header --><header class=\"border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60\"><div class=\"container-wrapper\"><div class=\"container h-14 flex flex-row items-center justify-between\"><div class=\"flex flex-row items-center gap-3\"><a class=\"flex items-center no-underline pb-[0.5px]\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 96, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 97, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -121,7 +121,7 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 			var templ_7745c5c3_Var7 templ.SafeURL
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(basePath)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 101, Col: 711}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 102, Col: 711}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -156,7 +156,7 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 			var templ_7745c5c3_Var10 templ.SafeURL
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/profile")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 104, Col: 718}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 105, Col: 718}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -187,7 +187,7 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 			var templ_7745c5c3_Var11 templ.SafeURL
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(basePath + "/logout")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 115, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 116, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -200,7 +200,7 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 116, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 117, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -226,7 +226,7 @@ func Root(basePath string, title string, showNav bool, csrf string) templ.Compon
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Year())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 134, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/layouts/root.templ`, Line: 135, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
