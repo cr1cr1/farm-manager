@@ -86,7 +86,7 @@ func main() {
 	// Protected routes (dashboard and fragments).
 	protected := s.Group(base)
 	protected.Middleware(middleware.Csrf(), middleware.RequireAuth())
-	handlers.RegisterDashboardRoutes(protected)
+	handlers.RegisterDashboardRoutes(protected, userRepo)
 	handlers.RegisterProfileRoutes(protected, userRepo)
 
 	s.Run()

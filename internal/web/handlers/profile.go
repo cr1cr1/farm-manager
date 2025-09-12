@@ -11,6 +11,36 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const (
+	THEME_SYSTEM = iota
+	THEME_DARK
+	THEME_LIGHT
+)
+
+// ThemeToString converts theme int to string for HTML attribute use.
+func ThemeToString(theme int) string {
+	switch theme {
+	case THEME_DARK:
+		return "dark"
+	case THEME_LIGHT:
+		return "light"
+	default:
+		return "system"
+	}
+}
+
+// ParseTheme converts string input to theme int, defaulting to system.
+func ParseTheme(themeStr string) int {
+	switch strings.ToLower(themeStr) {
+	case "dark":
+		return THEME_DARK
+	case "light":
+		return THEME_LIGHT
+	default:
+		return THEME_SYSTEM
+	}
+}
+
 type Profile struct {
 	Repo data.UserRepo
 }
@@ -123,17 +153,6 @@ func (p *Profile) ThemePost(r *ghttp.Request) {
 		return
 	}
 
-	themeStr := r.Get("theme").String()
-	var theme int
-	switch themeStr {
-	case "dark":
-		theme = 1
-	case "light":
-		theme = 2
-	default:
-		theme = 0 // default to system
-	}
-
 	// Get user to update theme
 	u, err := p.Repo.FindByUsername(r.GetCtx(), username)
 	if err != nil {
@@ -143,7 +162,7 @@ func (p *Profile) ThemePost(r *ghttp.Request) {
 	}
 
 	// Update theme in database
-	if err := p.Repo.UpdateTheme(r.GetCtx(), u.ID, theme); err != nil {
+	if err := p.Repo.UpdateTheme(r.GetCtx(), u.ID, ParseTheme(r.Get("theme").String())); err != nil {
 		g.Log().Errorf(r.GetCtx(), "update theme: %v", err)
 		r.Response.WriteHeader(500)
 		return

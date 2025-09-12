@@ -31,12 +31,12 @@ func ThemeToggle(args ThemeToggleArgs) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 
-		// Enhanced toggle that supports system theme: system -> light -> dark -> system
+		// Enhanced toggle that supports system theme: system -> dark -> light -> system
 		toggleExpr := `
 			if ($theme === 'system') {
-				$theme = 'light';
-			} else if ($theme === 'light') {
 				$theme = 'dark';
+			} else if ($theme === 'dark') {
+				$theme = 'light';
 			} else {
 				$theme = 'system';
 			}
@@ -78,46 +78,7 @@ func ThemeToggle(args ThemeToggleArgs) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><!-- System icon (when theme is system) --><svg class=\"h-4 w-4 transition-all\" style=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("display: $theme === 'system' ? 'block' : 'none'")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/components/themetoggle/themetoggle.templ`, Line: 28, Col: 61}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\" ry=\"2\"></rect> <line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"></line> <line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"></line></svg><!-- Sun icon (visible in light mode) --><svg class=\"h-4 w-4 transition-all\" style=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("display: $theme === 'light' ? 'block' : 'none'")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/components/themetoggle/themetoggle.templ`, Line: 40, Col: 60}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"5\"></circle> <path d=\"M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42\"></path></svg><!-- Moon icon (visible in dark mode) --><svg class=\"h-4 w-4 transition-all\" style=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("display: $theme === 'dark' ? 'block' : 'none'")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/components/themetoggle/themetoggle.templ`, Line: 51, Col: 59}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\"></path></svg> <span class=\"sr-only\">Toggle theme</span></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><!-- System icon (when theme is system) --><svg class=\"h-4 w-4 transition-all\" data-show=\"$theme === 'system'\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\" ry=\"2\"></rect> <line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"></line> <line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"></line></svg><!-- Sun icon (visible in light mode) --><svg class=\"h-4 w-4 transition-all\" data-show=\"$theme === 'light'\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"5\"></circle> <path d=\"M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42\"></path></svg><!-- Moon icon (visible in dark mode) --><svg class=\"h-4 w-4 transition-all\" data-show=\"$theme === 'dark'\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\"></path></svg> <span class=\"sr-only\">Toggle theme</span></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

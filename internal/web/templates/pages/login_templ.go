@@ -592,7 +592,7 @@ func LoginPage(basePath string, title string, csrf string, errs map[string]strin
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Root(basePath, title, false, csrf).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Root(basePath, title, false, csrf, 0).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

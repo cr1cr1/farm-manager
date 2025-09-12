@@ -3,30 +3,44 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/cr1cr1/farm-manager/internal/data"
 	"github.com/cr1cr1/farm-manager/internal/web/middleware"
 	"github.com/cr1cr1/farm-manager/internal/web/templates/pages"
 	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 // RegisterDashboardRoutes wires the protected dashboard and a demo fragment.
-func RegisterDashboardRoutes(group *ghttp.RouterGroup) {
-	d := &Dashboard{}
+func RegisterDashboardRoutes(group *ghttp.RouterGroup, repo data.UserRepo) {
+	d := &Dashboard{Repo: repo}
 	// Protected root
 	group.GET("/", d.DashboardGet)
 	// Demo fragment endpoint to showcase hypermedia/DataStar swap.
 	group.GET("/fragment/ping", d.PingFragment)
 }
 
-type Dashboard struct{}
+type Dashboard struct {
+	Repo data.UserRepo
+}
 
 // DashboardGet renders the blank dashboard shell with a placeholder area and demo button.
 func (d *Dashboard) DashboardGet(r *ghttp.Request) {
+	username, _ := middleware.CurrentUsername(r)
+
+	// Load user to get theme preference
+	var userTheme int
+	if username != "" {
+		if u, err := d.Repo.FindByUsername(r.GetCtx(), username); err == nil {
+			userTheme = u.Theme
+		}
+	}
+
 	_ = middleware.TemplRender(
 		r,
 		pages.DashboardPage(
 			middleware.BasePath(),
 			"Dashboard",
 			middleware.CsrfToken(r),
+			userTheme,
 		),
 	)
 }

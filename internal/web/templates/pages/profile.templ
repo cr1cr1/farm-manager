@@ -10,18 +10,6 @@ import (
 	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
 )
 
-// themeIntToString converts theme integer to string representation
-func themeIntToString(theme int) string {
-	switch theme {
-	case 1:
-		return "dark"
-	case 2:
-		return "light"
-	default:
-		return "system"
-	}
-}
-
 // ProfilePasswordFragment returns the password change section for DataStar fragment replacement
 templ ProfilePasswordFragment(basePath string, csrf string, errs map[string]string, success string) {
 	<div id="profile-password-container" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
@@ -140,35 +128,33 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 			<h3 class="text-lg font-semibold text-foreground">Appearance</h3>
 		</div>
 		<p class="text-sm text-muted-foreground mb-4">Choose how Farm Manager looks to you.</p>
-		<div data-signals="{ theme: 'system' }">
-			<div id="theme-status" class="mb-4"></div>
-			@formc.Form(formc.FormArgs{
-				Action: basePath + "/profile/theme",
-				Attributes: templ.Attributes{
-					"data-on-submit": "@post('" + basePath + "/profile/theme', { contentType: 'form', target: '#theme-status' })",
-				},
-			}) {
-				<input type="hidden" name="csrf_token" value={ csrf }/>
-				<div class="flex items-center justify-between">
-					<label class="text-sm font-medium text-foreground">Theme</label>
-					<div class="flex items-center space-x-2">
-						<span class="text-sm text-muted-foreground" data-text="$theme === 'light' ? 'Light' : $theme === 'dark' ? 'Dark' : 'System'"></span>
-						@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{
-							Attributes: templ.Attributes{
-								"data-on-click:after": "el.closest('form')?.requestSubmit()", // submit after toggle updates $theme
-							},
-						})
-					</div>
+		<div id="theme-status" class="mb-4"></div>
+		@formc.Form(formc.FormArgs{
+			Action: basePath + "/profile/theme",
+			Attributes: templ.Attributes{
+				"data-on-submit": "@post('" + basePath + "/profile/theme', { contentType: 'form', target: '#theme-status' })",
+			},
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			<div class="flex items-center justify-between">
+				<label class="text-sm font-medium text-foreground">Theme</label>
+				<div class="flex items-center space-x-2">
+					<span class="text-sm text-muted-foreground" data-text="$theme === 'light' ? 'Light' : $theme === 'dark' ? 'Dark' : 'System'"></span>
+					@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{
+						Attributes: templ.Attributes{
+							"data-on-click:after": "el.closest('form')?.requestSubmit()", // submit after toggle updates $theme
+						},
+					})
 				</div>
-			}
-		</div>
+			</div>
+		}
 	</div>
 	@ProfilePasswordFragment(basePath, csrf, errs, success)
 }
 
 // ProfilePage composes BaseLayout + ProfileContent for initial load.
 templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string, userTheme int) {
-	@layouts.Root(basePath, title, true, csrf) {
+	@layouts.Root(basePath, title, true, csrf, userTheme) {
 		@ProfileContent(basePath, csrf, errs, username, success, userTheme)
 	}
 }

@@ -3,12 +3,12 @@ package themetoggle
 // ThemeToggle wraps the original themetoggle with form submission and system theme support
 templ ThemeToggle(args ThemeToggleArgs) {
 	{{
-		// Enhanced toggle that supports system theme: system -> light -> dark -> system
+		// Enhanced toggle that supports system theme: system -> dark -> light -> system
 		toggleExpr := `
 			if ($theme === 'system') {
-				$theme = 'light';
-			} else if ($theme === 'light') {
 				$theme = 'dark';
+			} else if ($theme === 'dark') {
+				$theme = 'light';
 			} else {
 				$theme = 'system';
 			}
@@ -25,7 +25,7 @@ templ ThemeToggle(args ThemeToggleArgs) {
 			<!-- System icon (when theme is system) -->
 			<svg
 				class="h-4 w-4 transition-all"
-				style={ "display: $theme === 'system' ? 'block' : 'none'" }
+				data-show="$theme === 'system'"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -37,7 +37,7 @@ templ ThemeToggle(args ThemeToggleArgs) {
 			<!-- Sun icon (visible in light mode) -->
 			<svg
 				class="h-4 w-4 transition-all"
-				style={ "display: $theme === 'light' ? 'block' : 'none'" }
+				data-show="$theme === 'light'"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -48,7 +48,7 @@ templ ThemeToggle(args ThemeToggleArgs) {
 			<!-- Moon icon (visible in dark mode) -->
 			<svg
 				class="h-4 w-4 transition-all"
-				style={ "display: $theme === 'dark' ? 'block' : 'none'" }
+				data-show="$theme === 'dark'"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"

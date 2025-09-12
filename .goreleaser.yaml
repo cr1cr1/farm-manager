@@ -34,7 +34,7 @@ archives:
           - zip
     files:
       - db/migrations/*.sql
-      - public/**/*
+      - public/*
 
 checksum:
   name_template: "checksums.txt"

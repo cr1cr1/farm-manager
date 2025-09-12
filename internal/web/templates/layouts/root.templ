@@ -1,13 +1,13 @@
 package layouts
 
 import (
-	themetoggle "github.com/coreycole/datastarui/components/themetoggle"
+	themetoggle "github.com/cr1cr1/farm-manager/internal/web/templates/components/themetoggle"
 	"path/filepath"
 	"time"
 )
 
 // Root provides the shared HTML skeleton.
-templ Root(basePath string, title string, showNav bool, csrf string) {
+templ Root(basePath string, title string, showNav bool, csrf string, userTheme int) {
 	{{
 		// Find the hashed CSS file
 		cssFile := "/public/css/app.css" // fallback
@@ -72,12 +72,23 @@ templ Root(basePath string, title string, showNav bool, csrf string) {
 			</script>
 			<!-- Theme initialization -->
 			<script>
-				// Initialize theme from localStorage or system preference
+				// Initialize theme from user preference, localStorage, or system preference
 				function initTheme() {
-					const theme = localStorage.getItem('theme') ||
-						(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-					document.documentElement.classList.toggle('dark', theme === 'dark');
-					return theme;
+					let userTheme = {{ userTheme }};
+					let savedTheme = localStorage.getItem('theme');
+
+					// Check if user has a saved preference from database
+					if (userTheme && userTheme !== 0) {
+						const userThemeMap = {0: 'system', 1: 'dark', 2: 'light'};
+						savedTheme = userThemeMap[userTheme] || 'system';
+						// Update localStorage to match user's preference
+						localStorage.setItem('theme', savedTheme);
+					}
+
+					const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					const effectiveTheme = savedTheme === 'system' ? (systemPrefersDark ? 'dark' : 'light') : (savedTheme || (systemPrefersDark ? 'dark' : 'light'));
+					document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
+					return savedTheme || 'system';
 				}
 
 				// Set initial theme before page renders

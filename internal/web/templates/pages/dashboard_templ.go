@@ -55,7 +55,7 @@ func DashboardContent(basePath string, csrf string) templ.Component {
 }
 
 // DashboardPage composes the layout + content for initial full-page load.
-func DashboardPage(basePath string, title string, csrf string) templ.Component {
+func DashboardPage(basePath string, title string, csrf string, userTheme int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -94,7 +94,7 @@ func DashboardPage(basePath string, title string, csrf string) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf, userTheme).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

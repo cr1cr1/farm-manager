@@ -146,7 +146,7 @@ templ LoginFragment(basePath string, csrf string, errs map[string]string, userna
 
 // LoginPage composes BaseLayout + LoginContent for initial full-page load (no nav).
 templ LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) {
-	@layouts.Root(basePath, title, false, csrf) {
+	@layouts.Root(basePath, title, false, csrf, 0) {
 		@LoginContent(basePath, csrf, errs, username)
 	}
 }

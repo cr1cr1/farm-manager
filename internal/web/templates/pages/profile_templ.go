@@ -18,18 +18,6 @@ import (
 	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
 )
 
-// themeIntToString converts theme integer to string representation
-func themeIntToString(theme int) string {
-	switch theme {
-	case 1:
-		return "dark"
-	case 2:
-		return "light"
-	default:
-		return "system"
-	}
-}
-
 // ProfilePasswordFragment returns the password change section for DataStar fragment replacement
 func ProfilePasswordFragment(basePath string, csrf string, errs map[string]string, success string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -69,7 +57,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(signals.DataSignals)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 35, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 23, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -87,7 +75,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(success)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 41, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 29, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -106,7 +94,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(errs["form"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 44, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 32, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +128,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 54, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 42, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -415,7 +403,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs("$profile_password_form.current_password=''; $profile_password_form.new_password=''; $profile_password_form.confirm_password='';")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 123, Col: 149}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 111, Col: 149}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -463,13 +451,13 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 136, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 124, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p></div><div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h3 class=\"text-lg font-semibold text-foreground\">Appearance</h3></div><p class=\"text-sm text-muted-foreground mb-4\">Choose how Farm Manager looks to you.</p><div data-signals=\"{ theme: 'system' }\"><div id=\"theme-status\" class=\"mb-4\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p></div><div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h3 class=\"text-lg font-semibold text-foreground\">Appearance</h3></div><p class=\"text-sm text-muted-foreground mb-4\">Choose how Farm Manager looks to you.</p><div id=\"theme-status\" class=\"mb-4\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -492,7 +480,7 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 151, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 138, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -525,7 +513,7 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -577,7 +565,7 @@ func ProfilePage(basePath string, title string, csrf string, errs map[string]str
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf, userTheme).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
