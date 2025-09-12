@@ -7,6 +7,7 @@ builds:
     main: ./cmd/farm-manager
     env:
       - CGO_ENABLED=0
+      - GOFLAGS=-mod=vendor
     goos:
       - linux
       # - darwin
@@ -40,10 +41,3 @@ checksum:
 
 changelog:
   use: github
-
-release:
-  github:
-    owner: cr1cr1
-    name: farm-manager
-  draft: false
-  prerelease: auto
