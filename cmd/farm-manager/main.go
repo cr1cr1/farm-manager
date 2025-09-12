@@ -10,6 +10,7 @@ import (
 	"github.com/cr1cr1/farm-manager/internal/web/middleware"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gsession"
 )
 
 var (
@@ -44,6 +45,7 @@ func main() {
 
 	// Server.
 	s := g.Server()
+	s.SetSessionStorage(gsession.NewStorageMemory())
 	// Enable access and error logging via GoFrame logger (no sensitive data logged).
 	s.SetAccessLogEnabled(true)
 	s.SetErrorLogEnabled(true)
