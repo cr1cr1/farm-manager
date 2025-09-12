@@ -45,7 +45,15 @@ func main() {
 
 	// Server.
 	s := g.Server()
-	s.SetSessionStorage(gsession.NewStorageMemory())
+	// Session storage
+	switch os.Getenv("APP_SESSION_STORE") {
+	case "redis":
+		s.SetSessionStorage(gsession.NewStorageRedis(g.Redis()))
+	case "memory":
+		s.SetSessionStorage(gsession.NewStorageMemory())
+	default:
+		// Default to file-based sessions
+	}
 	// Enable access and error logging via GoFrame logger (no sensitive data logged).
 	s.SetAccessLogEnabled(true)
 	s.SetErrorLogEnabled(true)
