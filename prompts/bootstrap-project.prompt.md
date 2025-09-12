@@ -73,6 +73,7 @@ ubi = "latest"
 "ubi:bokwoon95/wgo" = "latest"
 "aqua:a-h/templ" = "latest"
 pnpm = "latest"
+"aqua:nektos/act" = "latest"
 ```
 
 4) mise-tasks/lint.sh
@@ -368,6 +369,7 @@ coverage*
 .DS_Store
 
 /farm-manager
+__debug_bin*
 ```
 
 19) README.dev.md

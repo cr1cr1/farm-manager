@@ -56,6 +56,7 @@ Dev hot reload
 ## Releasing
 
 - Tagging with v* (e.g., v0.1.0) triggers GitHub Actions to build and publish a GitHub Release via GoReleaser.
+  - Workflows can be tested locally with [act](https://github.com/nektos/act)
 - For local testing, use: mise run release-snapshot
 
 ## Application bootstrap (auth + dashboard)
