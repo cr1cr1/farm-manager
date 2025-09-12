@@ -36,9 +36,9 @@ var (
 
 // NewPoolConn creates and returns a connection with pool feature.
 func NewPoolConn(addr string, timeout ...time.Duration) (*PoolConn, error) {
-	v := addressPoolMap.GetOrSetFuncLock(addr, func() any {
+	v := addressPoolMap.GetOrSetFuncLock(addr, func() interface{} {
 		var pool *gpool.Pool
-		pool = gpool.New(defaultPoolExpire, func() (any, error) {
+		pool = gpool.New(defaultPoolExpire, func() (interface{}, error) {
 			if conn, err := NewConn(addr, timeout...); err == nil {
 				return &PoolConn{conn, pool, connStatusActive}, nil
 			} else {

@@ -7,7 +7,7 @@
 package ghttp
 
 // GetHandlerResponse retrieves and returns the handler response object and its error.
-func (r *Request) GetHandlerResponse() any {
+func (r *Request) GetHandlerResponse() interface{} {
 	return r.handlerResponse
 }
 

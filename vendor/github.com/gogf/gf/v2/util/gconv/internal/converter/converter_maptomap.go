@@ -36,7 +36,7 @@ func (c *Converter) MapToMap(
 		paramsRv = reflect.ValueOf(params)
 	}
 	paramsKind = paramsRv.Kind()
-	if paramsKind == reflect.Pointer {
+	if paramsKind == reflect.Ptr {
 		paramsRv = paramsRv.Elem()
 		paramsKind = paramsRv.Kind()
 	}
@@ -58,7 +58,7 @@ func (c *Converter) MapToMap(
 		pointerRv = reflect.ValueOf(pointer)
 	}
 	pointerKind := pointerRv.Kind()
-	for pointerKind == reflect.Pointer {
+	for pointerKind == reflect.Ptr {
 		pointerRv = pointerRv.Elem()
 		pointerKind = pointerRv.Kind()
 	}
@@ -93,7 +93,7 @@ func (c *Converter) MapToMap(
 		}
 	)
 	// Retrieve the true element type of target map.
-	if pointerValueKind == reflect.Pointer {
+	if pointerValueKind == reflect.Ptr {
 		pointerValueKind = pointerValueType.Elem().Kind()
 	}
 	for _, key := range paramsKeys {

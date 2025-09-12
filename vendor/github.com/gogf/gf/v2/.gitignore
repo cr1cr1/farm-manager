@@ -24,4 +24,3 @@ node_modules
 .docusaurus
 output
 .example/
-.golangci.bck.yml

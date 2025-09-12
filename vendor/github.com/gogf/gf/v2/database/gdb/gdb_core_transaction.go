@@ -57,13 +57,10 @@ type TxOptions struct {
 	ReadOnly bool
 }
 
-// Context key types for transaction to avoid collisions
-type transactionCtxKey string
-
 const (
-	transactionPointerPrefix                      = "transaction"
-	contextTransactionKeyPrefix                   = "TransactionObjectForGroup_"
-	transactionIdForLoggerCtx   transactionCtxKey = "TransactionId"
+	transactionPointerPrefix    = "transaction"
+	contextTransactionKeyPrefix = "TransactionObjectForGroup_"
+	transactionIdForLoggerCtx   = "TransactionId"
 )
 
 var transactionIdGenerator = gtype.NewUint64()
@@ -289,7 +286,7 @@ func TXFromCtx(ctx context.Context, group string) TX {
 	return nil
 }
 
-// transactionKeyForContext forms and returns a key for storing transaction object of certain database group into context.
-func transactionKeyForContext(group string) transactionCtxKey {
-	return transactionCtxKey(contextTransactionKeyPrefix + group)
+// transactionKeyForContext forms and returns a string for storing transaction object of certain database group into context.
+func transactionKeyForContext(group string) string {
+	return contextTransactionKeyPrefix + group
 }

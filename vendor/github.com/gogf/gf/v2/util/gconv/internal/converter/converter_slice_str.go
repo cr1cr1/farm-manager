@@ -16,8 +16,8 @@ import (
 )
 
 // SliceStr converts `any` to []string.
-func (c *Converter) SliceStr(anyInput any, option ...SliceOption) ([]string, error) {
-	if empty.IsNil(anyInput) {
+func (c *Converter) SliceStr(any interface{}, option ...SliceOption) ([]string, error) {
+	if empty.IsNil(any) {
 		return nil, nil
 	}
 	var (
@@ -26,7 +26,7 @@ func (c *Converter) SliceStr(anyInput any, option ...SliceOption) ([]string, err
 		array       []string = nil
 		sliceOption          = c.getSliceOption(option...)
 	)
-	switch value := anyInput.(type) {
+	switch value := any.(type) {
 	case []int:
 		array = make([]string, len(value))
 		for k, v := range value {
@@ -161,7 +161,7 @@ func (c *Converter) SliceStr(anyInput any, option ...SliceOption) ([]string, err
 			}
 			array[k] = s
 		}
-	case []any:
+	case []interface{}:
 		array = make([]string, len(value))
 		for k, v := range value {
 			s, err = c.String(v)
@@ -185,14 +185,14 @@ func (c *Converter) SliceStr(anyInput any, option ...SliceOption) ([]string, err
 	if array != nil {
 		return array, err
 	}
-	if v, ok := anyInput.(localinterface.IStrings); ok {
+	if v, ok := any.(localinterface.IStrings); ok {
 		return v.Strings(), err
 	}
-	if v, ok := anyInput.(localinterface.IInterfaces); ok {
+	if v, ok := any.(localinterface.IInterfaces); ok {
 		return c.SliceStr(v.Interfaces(), option...)
 	}
 	// Not a common type, it then uses reflection for conversion.
-	originValueAndKind := reflection.OriginValueAndKind(anyInput)
+	originValueAndKind := reflection.OriginValueAndKind(any)
 	switch originValueAndKind.OriginKind {
 	case reflect.Slice, reflect.Array:
 		var (
@@ -212,7 +212,7 @@ func (c *Converter) SliceStr(anyInput any, option ...SliceOption) ([]string, err
 		if originValueAndKind.OriginValue.IsZero() {
 			return []string{}, err
 		}
-		s, err = c.String(anyInput)
+		s, err = c.String(any)
 		if err != nil && !sliceOption.ContinueOnError {
 			return nil, err
 		}

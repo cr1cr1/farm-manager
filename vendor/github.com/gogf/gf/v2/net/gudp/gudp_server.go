@@ -52,7 +52,7 @@ var (
 )
 
 // GetServer creates and returns an udp server instance with given name.
-func GetServer(name ...any) *Server {
+func GetServer(name ...interface{}) *Server {
 	serverName := defaultServer
 	if len(name) > 0 && name[0] != "" {
 		serverName = gconv.String(name[0])

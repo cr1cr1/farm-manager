@@ -67,7 +67,7 @@ func StackWithFilters(filters []string, skip ...int) string {
 			if index > 9 {
 				space = " "
 			}
-			fmt.Fprintf(buffer, "%d.%s%s\n    %s:%d\n", index, space, name, file, line)
+			buffer.WriteString(fmt.Sprintf("%d.%s%s\n    %s:%d\n", index, space, name, file, line))
 			index++
 		} else {
 			break

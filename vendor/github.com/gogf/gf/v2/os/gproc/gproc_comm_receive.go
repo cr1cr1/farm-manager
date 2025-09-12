@@ -39,7 +39,7 @@ func Receive(group ...string) *MsgRequest {
 	} else {
 		groupName = defaultGroupNameForProcComm
 	}
-	queue := commReceiveQueues.GetOrSetFuncLock(groupName, func() any {
+	queue := commReceiveQueues.GetOrSetFuncLock(groupName, func() interface{} {
 		return gqueue.New(maxLengthForProcMsgQueue)
 	}).(*gqueue.Queue)
 

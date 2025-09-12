@@ -49,7 +49,7 @@ func (c *Converter) Structs(params any, pointer any, option ...StructsOption) (e
 	pointerRv, ok := pointer.(reflect.Value)
 	if !ok {
 		pointerRv = reflect.ValueOf(pointer)
-		if kind := pointerRv.Kind(); kind != reflect.Pointer {
+		if kind := pointerRv.Kind(); kind != reflect.Ptr {
 			return gerror.NewCodef(
 				gcode.CodeInvalidParameter,
 				"pointer should be type of pointer, but got: %v", kind,
@@ -63,7 +63,7 @@ func (c *Converter) Structs(params any, pointer any, option ...StructsOption) (e
 		paramsKind    = paramsRv.Kind()
 		structsOption = c.getStructsOption(option...)
 	)
-	for paramsKind == reflect.Pointer {
+	for paramsKind == reflect.Ptr {
 		paramsRv = paramsRv.Elem()
 		paramsKind = paramsRv.Kind()
 	}
@@ -99,7 +99,7 @@ func (c *Converter) Structs(params any, pointer any, option ...StructsOption) (e
 		pointerRvElem    = pointerRv.Elem()
 		pointerRvLength  = pointerRvElem.Len()
 	)
-	if itemTypeKind == reflect.Pointer {
+	if itemTypeKind == reflect.Ptr {
 		// Pointer element.
 		for i := 0; i < len(paramsList); i++ {
 			var tempReflectValue reflect.Value

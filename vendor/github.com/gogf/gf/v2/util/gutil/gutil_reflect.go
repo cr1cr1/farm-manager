@@ -16,11 +16,11 @@ type (
 )
 
 // OriginValueAndKind retrieves and returns the original reflect value and kind.
-func OriginValueAndKind(value any) (out OriginValueAndKindOutput) {
+func OriginValueAndKind(value interface{}) (out OriginValueAndKindOutput) {
 	return reflection.OriginValueAndKind(value)
 }
 
 // OriginTypeAndKind retrieves and returns the original reflect type and kind.
-func OriginTypeAndKind(value any) (out OriginTypeAndKindOutput) {
+func OriginTypeAndKind(value interface{}) (out OriginTypeAndKindOutput) {
 	return reflection.OriginTypeAndKind(value)
 }

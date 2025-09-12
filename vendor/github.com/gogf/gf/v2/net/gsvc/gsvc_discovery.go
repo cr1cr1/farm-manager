@@ -44,11 +44,11 @@ func GetAndWatchWithDiscovery(ctx context.Context, discovery Discovery, name str
 		return nil, gerror.NewCodef(gcode.CodeInvalidParameter, `discovery cannot be nil`)
 	}
 	// Retrieve service map by discovery object.
-	watchedServiceMap := watchedMap.GetOrSetFunc(discovery, func() any {
+	watchedServiceMap := watchedMap.GetOrSetFunc(discovery, func() interface{} {
 		return gmap.NewStrAnyMap(true)
 	}).(*gmap.StrAnyMap)
 	// Retrieve service by name.
-	storedService := watchedServiceMap.GetOrSetFuncLock(name, func() any {
+	storedService := watchedServiceMap.GetOrSetFuncLock(name, func() interface{} {
 		var (
 			services []Service
 			watcher  Watcher

@@ -23,7 +23,7 @@ import (
 //
 // It supports common variable type asserting, and finally it uses fmt.Sprintf converting
 // value to string and then to bytes.
-func LeEncode(values ...any) []byte {
+func LeEncode(values ...interface{}) []byte {
 	buf := new(bytes.Buffer)
 	for i := 0; i < len(values); i++ {
 		if values[i] == nil {
@@ -71,7 +71,7 @@ func LeEncode(values ...any) []byte {
 	return buf.Bytes()
 }
 
-func LeEncodeByLength(length int, values ...any) []byte {
+func LeEncodeByLength(length int, values ...interface{}) []byte {
 	b := LeEncode(values...)
 	if len(b) < length {
 		b = append(b, make([]byte, length-len(b))...)
@@ -81,7 +81,7 @@ func LeEncodeByLength(length int, values ...any) []byte {
 	return b
 }
 
-func LeDecode(b []byte, values ...any) error {
+func LeDecode(b []byte, values ...interface{}) error {
 	var (
 		err error
 		buf = bytes.NewBuffer(b)

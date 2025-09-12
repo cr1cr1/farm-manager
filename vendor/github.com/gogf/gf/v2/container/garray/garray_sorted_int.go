@@ -420,11 +420,11 @@ func (a *SortedIntArray) Slice() []int {
 	return array
 }
 
-// Interfaces returns current array as []any.
-func (a *SortedIntArray) Interfaces() []any {
+// Interfaces returns current array as []interface{}.
+func (a *SortedIntArray) Interfaces() []interface{} {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	array := make([]any, len(a.array))
+	array := make([]interface{}, len(a.array))
 	for k, v := range a.array {
 		array[k] = v
 	}
@@ -496,9 +496,13 @@ func (a *SortedIntArray) Unique() *SortedIntArray {
 	if len(a.array) == 0 {
 		return a
 	}
-	for i := 0; i < len(a.array)-1; {
+	i := 0
+	for {
+		if i == len(a.array)-1 {
+			break
+		}
 		if a.getComparator()(a.array[i], a.array[i+1]) == 0 {
-			a.array = append(a.array[:i+1], a.array[i+2:]...)
+			a.array = append(a.array[:i+1], a.array[i+1+1:]...)
 		} else {
 			i++
 		}
@@ -545,7 +549,7 @@ func (a *SortedIntArray) RLockFunc(f func(array []int)) *SortedIntArray {
 // The parameter `array` can be any garray or slice type.
 // The difference between Merge and Append is Append supports only specified slice type,
 // but Merge supports more parameter types.
-func (a *SortedIntArray) Merge(array any) *SortedIntArray {
+func (a *SortedIntArray) Merge(array interface{}) *SortedIntArray {
 	return a.Add(gconv.Ints(array)...)
 }
 
@@ -687,7 +691,7 @@ func (a *SortedIntArray) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalValue is an interface implement which sets any type of value for array.
-func (a *SortedIntArray) UnmarshalValue(value any) (err error) {
+func (a *SortedIntArray) UnmarshalValue(value interface{}) (err error) {
 	if a.comparator == nil {
 		a.comparator = defaultComparatorInt
 	}
@@ -771,7 +775,7 @@ func (a *SortedIntArray) getComparator() func(a, b int) int {
 }
 
 // DeepCopy implements interface for deep copy of current type.
-func (a *SortedIntArray) DeepCopy() any {
+func (a *SortedIntArray) DeepCopy() interface{} {
 	if a == nil {
 		return nil
 	}

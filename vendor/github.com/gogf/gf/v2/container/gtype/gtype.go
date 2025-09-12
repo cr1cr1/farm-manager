@@ -9,6 +9,6 @@ package gtype
 
 // New is alias of NewAny.
 // See NewAny, NewInterface.
-func New(value ...any) *Any {
+func New(value ...interface{}) *Any {
 	return NewAny(value...)
 }

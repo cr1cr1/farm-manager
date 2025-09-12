@@ -36,7 +36,7 @@ func (r *Request) Assigns(data gview.Params) {
 }
 
 // Assign binds a template variable to current request.
-func (r *Request) Assign(key string, value any) {
+func (r *Request) Assign(key string, value interface{}) {
 	if r.viewParams == nil {
 		r.viewParams = make(gview.Params)
 	}

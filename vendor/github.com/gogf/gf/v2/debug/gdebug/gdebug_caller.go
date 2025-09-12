@@ -187,12 +187,12 @@ func CallerFileLineShort() string {
 }
 
 // FuncPath returns the complete function path of given `f`.
-func FuncPath(f any) string {
+func FuncPath(f interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
 
 // FuncName returns the function name of given `f`.
-func FuncName(f any) string {
+func FuncName(f interface{}) string {
 	path := FuncPath(f)
 	if path == "" {
 		return ""

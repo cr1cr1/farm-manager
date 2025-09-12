@@ -52,7 +52,9 @@ func New(path string, cache bool) *SPath {
 		sp.cache = gmap.NewStrStrMap(true)
 	}
 	if len(path) > 0 {
-		_, _ = sp.Add(path)
+		if _, err := sp.Add(path); err != nil {
+			// intlog.Print(err)
+		}
 	}
 	return sp
 }
@@ -65,7 +67,7 @@ func Get(root string, cache bool) *SPath {
 	if root == "" {
 		root = "/"
 	}
-	return pathsMap.GetOrSetFuncLock(root, func() any {
+	return pathsMap.GetOrSetFuncLock(root, func() interface{} {
 		return New(root, cache)
 	}).(*SPath)
 }

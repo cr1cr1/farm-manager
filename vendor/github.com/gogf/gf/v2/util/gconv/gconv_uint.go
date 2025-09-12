@@ -7,31 +7,31 @@
 package gconv
 
 // Uint converts `any` to uint.
-func Uint(anyInput any) uint {
-	v, _ := defaultConverter.Uint(anyInput)
+func Uint(any any) uint {
+	v, _ := defaultConverter.Uint(any)
 	return v
 }
 
 // Uint8 converts `any` to uint8.
-func Uint8(anyInput any) uint8 {
-	v, _ := defaultConverter.Uint8(anyInput)
+func Uint8(any any) uint8 {
+	v, _ := defaultConverter.Uint8(any)
 	return v
 }
 
 // Uint16 converts `any` to uint16.
-func Uint16(anyInput any) uint16 {
-	v, _ := defaultConverter.Uint16(anyInput)
+func Uint16(any any) uint16 {
+	v, _ := defaultConverter.Uint16(any)
 	return v
 }
 
 // Uint32 converts `any` to uint32.
-func Uint32(anyInput any) uint32 {
-	v, _ := defaultConverter.Uint32(anyInput)
+func Uint32(any any) uint32 {
+	v, _ := defaultConverter.Uint32(any)
 	return v
 }
 
 // Uint64 converts `any` to uint64.
-func Uint64(anyInput any) uint64 {
-	v, _ := defaultConverter.Uint64(anyInput)
+func Uint64(any any) uint64 {
+	v, _ := defaultConverter.Uint64(any)
 	return v
 }

@@ -15,11 +15,11 @@ import (
 )
 
 // Bool converts `any` to bool.
-func (c *Converter) Bool(anyInput any) (bool, error) {
-	if empty.IsNil(anyInput) {
+func (c *Converter) Bool(any any) (bool, error) {
+	if empty.IsNil(any) {
 		return false, nil
 	}
-	switch value := anyInput.(type) {
+	switch value := any.(type) {
 	case bool:
 		return value, nil
 	case []byte:
@@ -36,9 +36,9 @@ func (c *Converter) Bool(anyInput any) (bool, error) {
 		if f, ok := value.(localinterface.IBool); ok {
 			return f.Bool(), nil
 		}
-		rv := reflect.ValueOf(anyInput)
+		rv := reflect.ValueOf(any)
 		switch rv.Kind() {
-		case reflect.Pointer:
+		case reflect.Ptr:
 			if rv.IsNil() {
 				return false, nil
 			}
@@ -62,7 +62,7 @@ func (c *Converter) Bool(anyInput any) (bool, error) {
 		case reflect.Struct:
 			return true, nil
 		default:
-			s, err := c.String(anyInput)
+			s, err := c.String(any)
 			if err != nil {
 				return false, err
 			}

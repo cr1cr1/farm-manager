@@ -17,8 +17,8 @@ import (
 )
 
 // SliceFloat32 converts `any` to []float32.
-func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32, error) {
-	if empty.IsNil(anyInput) {
+func (c *Converter) SliceFloat32(any interface{}, option ...SliceOption) ([]float32, error) {
+	if empty.IsNil(any) {
 		return nil, nil
 	}
 	var (
@@ -27,7 +27,7 @@ func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32
 		array       []float32 = nil
 		sliceOption           = c.getSliceOption(option...)
 	)
-	switch value := anyInput.(type) {
+	switch value := any.(type) {
 	case []string:
 		array = make([]float32, len(value))
 		for k, v := range value {
@@ -169,7 +169,7 @@ func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32
 			}
 			array[k] = f
 		}
-	case []any:
+	case []interface{}:
 		array = make([]float32, len(value))
 		for k, v := range value {
 			f, err = c.Float32(v)
@@ -182,14 +182,14 @@ func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32
 	if array != nil {
 		return array, err
 	}
-	if v, ok := anyInput.(localinterface.IFloats); ok {
+	if v, ok := any.(localinterface.IFloats); ok {
 		return c.SliceFloat32(v.Floats(), option...)
 	}
-	if v, ok := anyInput.(localinterface.IInterfaces); ok {
+	if v, ok := any.(localinterface.IInterfaces); ok {
 		return c.SliceFloat32(v.Interfaces(), option...)
 	}
 	// Not a common type, it then uses reflection for conversion.
-	originValueAndKind := reflection.OriginValueAndKind(anyInput)
+	originValueAndKind := reflection.OriginValueAndKind(any)
 	switch originValueAndKind.OriginKind {
 	case reflect.Slice, reflect.Array:
 		var (
@@ -209,7 +209,7 @@ func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32
 		if originValueAndKind.OriginValue.IsZero() {
 			return []float32{}, err
 		}
-		f, err = c.Float32(anyInput)
+		f, err = c.Float32(any)
 		if err != nil && !sliceOption.ContinueOnError {
 			return nil, err
 		}
@@ -218,8 +218,8 @@ func (c *Converter) SliceFloat32(anyInput any, option ...SliceOption) ([]float32
 }
 
 // SliceFloat64 converts `any` to []float64.
-func (c *Converter) SliceFloat64(anyInput any, option ...SliceOption) ([]float64, error) {
-	if empty.IsNil(anyInput) {
+func (c *Converter) SliceFloat64(any interface{}, option ...SliceOption) ([]float64, error) {
+	if empty.IsNil(any) {
 		return nil, nil
 	}
 	var (
@@ -228,7 +228,7 @@ func (c *Converter) SliceFloat64(anyInput any, option ...SliceOption) ([]float64
 		array       []float64 = nil
 		sliceOption           = c.getSliceOption(option...)
 	)
-	switch value := anyInput.(type) {
+	switch value := any.(type) {
 	case []string:
 		array = make([]float64, len(value))
 		for k, v := range value {
@@ -370,7 +370,7 @@ func (c *Converter) SliceFloat64(anyInput any, option ...SliceOption) ([]float64
 		}
 	case []float64:
 		array = value
-	case []any:
+	case []interface{}:
 		array = make([]float64, len(value))
 		for k, v := range value {
 			f, err = c.Float64(v)
@@ -383,14 +383,14 @@ func (c *Converter) SliceFloat64(anyInput any, option ...SliceOption) ([]float64
 	if array != nil {
 		return array, err
 	}
-	if v, ok := anyInput.(localinterface.IFloats); ok {
+	if v, ok := any.(localinterface.IFloats); ok {
 		return v.Floats(), err
 	}
-	if v, ok := anyInput.(localinterface.IInterfaces); ok {
+	if v, ok := any.(localinterface.IInterfaces); ok {
 		return c.SliceFloat64(v.Interfaces(), option...)
 	}
 	// Not a common type, it then uses reflection for conversion.
-	originValueAndKind := reflection.OriginValueAndKind(anyInput)
+	originValueAndKind := reflection.OriginValueAndKind(any)
 	switch originValueAndKind.OriginKind {
 	case reflect.Slice, reflect.Array:
 		var (
@@ -410,7 +410,7 @@ func (c *Converter) SliceFloat64(anyInput any, option ...SliceOption) ([]float64
 		if originValueAndKind.OriginValue.IsZero() {
 			return []float64{}, err
 		}
-		f, err = c.Float64(anyInput)
+		f, err = c.Float64(any)
 		if err != nil && !sliceOption.ContinueOnError {
 			return nil, err
 		}

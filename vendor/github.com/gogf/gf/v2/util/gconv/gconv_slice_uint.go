@@ -7,39 +7,39 @@
 package gconv
 
 // SliceUint is alias of Uints.
-func SliceUint(anyInput any) []uint {
-	return Uints(anyInput)
+func SliceUint(any interface{}) []uint {
+	return Uints(any)
 }
 
 // SliceUint32 is alias of Uint32s.
-func SliceUint32(anyInput any) []uint32 {
-	return Uint32s(anyInput)
+func SliceUint32(any interface{}) []uint32 {
+	return Uint32s(any)
 }
 
 // SliceUint64 is alias of Uint64s.
-func SliceUint64(anyInput any) []uint64 {
-	return Uint64s(anyInput)
+func SliceUint64(any interface{}) []uint64 {
+	return Uint64s(any)
 }
 
 // Uints converts `any` to []uint.
-func Uints(anyInput any) []uint {
-	result, _ := defaultConverter.SliceUint(anyInput, SliceOption{
+func Uints(any interface{}) []uint {
+	result, _ := defaultConverter.SliceUint(any, SliceOption{
 		ContinueOnError: true,
 	})
 	return result
 }
 
 // Uint32s converts `any` to []uint32.
-func Uint32s(anyInput any) []uint32 {
-	result, _ := defaultConverter.SliceUint32(anyInput, SliceOption{
+func Uint32s(any interface{}) []uint32 {
+	result, _ := defaultConverter.SliceUint32(any, SliceOption{
 		ContinueOnError: true,
 	})
 	return result
 }
 
 // Uint64s converts `any` to []uint64.
-func Uint64s(anyInput any) []uint64 {
-	result, _ := defaultConverter.SliceUint64(anyInput, SliceOption{
+func Uint64s(any interface{}) []uint64 {
+	result, _ := defaultConverter.SliceUint64(any, SliceOption{
 		ContinueOnError: true,
 	})
 	return result

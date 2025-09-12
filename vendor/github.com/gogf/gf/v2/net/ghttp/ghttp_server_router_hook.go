@@ -111,7 +111,7 @@ func (r *Request) getHookHandlers(hook HookName) []*HandlerItemParsed {
 // niceCallHookHandler nicely calls the hook handler function,
 // which means it automatically catches and returns the possible panic error to
 // avoid goroutine crash.
-func (s *Server) niceCallHookHandler(f HandlerFunc, r *Request) (err any) {
+func (s *Server) niceCallHookHandler(f HandlerFunc, r *Request) (err interface{}) {
 	defer func() {
 		err = recover()
 	}()

@@ -9,7 +9,6 @@ package gdb
 import (
 	"context"
 	"database/sql/driver"
-	"math/big"
 	"reflect"
 	"strings"
 	"time"
@@ -70,7 +69,7 @@ func (c *Core) GetFieldType(ctx context.Context, fieldName, table, schema string
 //
 // The parameter `value` should be type of *map/map/*struct/struct.
 // It supports embedded struct definition for struct.
-func (c *Core) ConvertDataForRecord(ctx context.Context, value any, table string) (map[string]any, error) {
+func (c *Core) ConvertDataForRecord(ctx context.Context, value interface{}, table string) (map[string]interface{}, error) {
 	var (
 		err  error
 		data = MapOrStructToMapDeep(value, true)
@@ -92,7 +91,7 @@ func (c *Core) ConvertDataForRecord(ctx context.Context, value any, table string
 // ConvertValueForField converts value to the type of the record field.
 // The parameter `fieldType` is the target record field.
 // The parameter `fieldValue` is the value that to be committed to record field.
-func (c *Core) ConvertValueForField(ctx context.Context, fieldType string, fieldValue any) (any, error) {
+func (c *Core) ConvertValueForField(ctx context.Context, fieldType string, fieldValue interface{}) (interface{}, error) {
 	var (
 		err            error
 		convertedValue = fieldValue
@@ -114,7 +113,7 @@ Default:
 		rvValue = reflect.ValueOf(fieldValue)
 		rvKind  = rvValue.Kind()
 	)
-	for rvKind == reflect.Pointer {
+	for rvKind == reflect.Ptr {
 		rvValue = rvValue.Elem()
 		rvKind = rvValue.Kind()
 	}
@@ -223,9 +222,14 @@ Default:
 	return convertedValue, nil
 }
 
-// GetFormattedDBTypeNameForField retrieves and returns the formatted database type name
-// eg. `int(10) unsigned` -> `int`, `varchar(100)` -> `varchar`, etc.
-func (c *Core) GetFormattedDBTypeNameForField(fieldType string) (typeName, typePattern string) {
+// CheckLocalTypeForField checks and returns corresponding type for given db type.
+// The `fieldType` is retrieved from ColumnTypes of db driver, example:
+// UNSIGNED INT
+func (c *Core) CheckLocalTypeForField(ctx context.Context, fieldType string, _ interface{}) (LocalType, error) {
+	var (
+		typeName    string
+		typePattern string
+	)
 	match, _ := gregex.MatchString(`(.+?)\((.+)\)`, fieldType)
 	if len(match) == 3 {
 		typeName = gstr.Trim(match[1])
@@ -238,19 +242,9 @@ func (c *Core) GetFormattedDBTypeNameForField(fieldType string) (typeName, typeP
 			typeName = array[0]
 		}
 	}
-	typeName = strings.ToLower(typeName)
-	return
-}
 
-// CheckLocalTypeForField checks and returns corresponding type for given db type.
-// The `fieldType` is retrieved from ColumnTypes of db driver, example:
-// UNSIGNED INT
-func (c *Core) CheckLocalTypeForField(ctx context.Context, fieldType string, _ any) (LocalType, error) {
-	var (
-		typeName    string
-		typePattern string
-	)
-	typeName, typePattern = c.GetFormattedDBTypeNameForField(fieldType)
+	typeName = strings.ToLower(typeName)
+
 	switch typeName {
 	case
 		fieldTypeBinary,
@@ -282,13 +276,6 @@ func (c *Core) CheckLocalTypeForField(ctx context.Context, fieldType string, _ a
 			return LocalTypeUint64, nil
 		}
 		return LocalTypeInt64, nil
-
-	case
-		fieldTypeInt128,
-		fieldTypeInt256,
-		fieldTypeUint128,
-		fieldTypeUint256:
-		return LocalTypeBigInt, nil
 
 	case
 		fieldTypeReal:
@@ -379,10 +366,10 @@ func (c *Core) CheckLocalTypeForField(ctx context.Context, fieldType string, _ a
 // The parameter `fieldType` is in lower case, like:
 // `float(5,2)`, `unsigned double(5,2)`, `decimal(10,2)`, `char(45)`, `varchar(100)`, etc.
 func (c *Core) ConvertValueForLocal(
-	ctx context.Context, fieldType string, fieldValue any,
-) (any, error) {
+	ctx context.Context, fieldType string, fieldValue interface{},
+) (interface{}, error) {
 	// If there's no type retrieved, it returns the `fieldValue` directly
-	// to use its original data type, as `fieldValue` is type of any.
+	// to use its original data type, as `fieldValue` is type of interface{}.
 	if fieldType == "" {
 		return fieldValue, nil
 	}
@@ -415,16 +402,6 @@ func (c *Core) ConvertValueForLocal(
 
 	case LocalTypeUint64Bytes:
 		return gbinary.BeDecodeToUint64(gconv.Bytes(fieldValue)), nil
-
-	case LocalTypeBigInt:
-		switch v := fieldValue.(type) {
-		case big.Int:
-			return v.String(), nil
-		case *big.Int:
-			return v.String(), nil
-		default:
-			return gconv.String(fieldValue), nil
-		}
 
 	case LocalTypeFloat32:
 		return gconv.Float32(gconv.String(fieldValue)), nil
@@ -471,7 +448,7 @@ func (c *Core) ConvertValueForLocal(
 
 // mappingAndFilterData automatically mappings the map key to table field and removes
 // all key-value pairs that are not the field of given table.
-func (c *Core) mappingAndFilterData(ctx context.Context, schema, table string, data map[string]any, filter bool) (map[string]any, error) {
+func (c *Core) mappingAndFilterData(ctx context.Context, schema, table string, data map[string]interface{}, filter bool) (map[string]interface{}, error) {
 	fieldsMap, err := c.db.TableFields(ctx, c.guessPrimaryTableName(table), schema)
 	if err != nil {
 		return nil, err
@@ -479,7 +456,7 @@ func (c *Core) mappingAndFilterData(ctx context.Context, schema, table string, d
 	if len(fieldsMap) == 0 {
 		return nil, gerror.Newf(`The table %s may not exist, or the table contains no fields`, table)
 	}
-	fieldsKeyMap := make(map[string]any, len(fieldsMap))
+	fieldsKeyMap := make(map[string]interface{}, len(fieldsMap))
 	for k := range fieldsMap {
 		fieldsKeyMap[k] = nil
 	}

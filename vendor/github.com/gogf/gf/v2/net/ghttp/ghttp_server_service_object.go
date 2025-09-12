@@ -21,7 +21,7 @@ import (
 //
 // The optional parameter `method` is used to specify the method to be registered, which
 // supports multiple method names; multiple methods are separated by char ',', case-sensitive.
-func (s *Server) BindObject(pattern string, object any, method ...string) {
+func (s *Server) BindObject(pattern string, object interface{}, method ...string) {
 	var bindMethod = ""
 	if len(method) > 0 {
 		bindMethod = method[0]
@@ -40,7 +40,7 @@ func (s *Server) BindObject(pattern string, object any, method ...string) {
 //
 // The optional parameter `method` is used to specify the method to be registered, which
 // does not support multiple method names but only one, case-sensitive.
-func (s *Server) BindObjectMethod(pattern string, object any, method string) {
+func (s *Server) BindObjectMethod(pattern string, object interface{}, method string) {
 	s.doBindObjectMethod(context.TODO(), doBindObjectMethodInput{
 		Prefix:     "",
 		Pattern:    pattern,
@@ -52,7 +52,7 @@ func (s *Server) BindObjectMethod(pattern string, object any, method string) {
 }
 
 // BindObjectRest registers object in REST API styles to server with a specified pattern.
-func (s *Server) BindObjectRest(pattern string, object any) {
+func (s *Server) BindObjectRest(pattern string, object interface{}) {
 	s.doBindObjectRest(context.TODO(), doBindObjectInput{
 		Prefix:     "",
 		Pattern:    pattern,
@@ -66,7 +66,7 @@ func (s *Server) BindObjectRest(pattern string, object any) {
 type doBindObjectInput struct {
 	Prefix     string
 	Pattern    string
-	Object     any
+	Object     interface{}
 	Method     string
 	Middleware []HandlerFunc
 	Source     string
@@ -179,7 +179,7 @@ func (s *Server) doBindObject(ctx context.Context, in doBindObjectInput) {
 type doBindObjectMethodInput struct {
 	Prefix     string
 	Pattern    string
-	Object     any
+	Object     interface{}
 	Method     string
 	Middleware []HandlerFunc
 	Source     string

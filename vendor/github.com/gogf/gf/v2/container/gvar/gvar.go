@@ -14,14 +14,14 @@ import (
 
 // Var is an universal variable type implementer.
 type Var struct {
-	value any  // Underlying value.
-	safe  bool // Concurrent safe or not.
+	value interface{} // Underlying value.
+	safe  bool        // Concurrent safe or not.
 }
 
 // New creates and returns a new Var with given `value`.
 // The optional parameter `safe` specifies whether Var is used in concurrent-safety,
 // which is false in default.
-func New(value any, safe ...bool) *Var {
+func New(value interface{}, safe ...bool) *Var {
 	if len(safe) > 0 && safe[0] {
 		return &Var{
 			value: gtype.NewInterface(value),
@@ -40,7 +40,7 @@ func (v *Var) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements the interface UnmarshalJSON for json.Unmarshal.
 func (v *Var) UnmarshalJSON(b []byte) error {
-	var i any
+	var i interface{}
 	if err := json.UnmarshalUseNumber(b, &i); err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (v *Var) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalValue is an interface implement which sets any type of value for Var.
-func (v *Var) UnmarshalValue(value any) error {
+func (v *Var) UnmarshalValue(value interface{}) error {
 	v.Set(value)
 	return nil
 }

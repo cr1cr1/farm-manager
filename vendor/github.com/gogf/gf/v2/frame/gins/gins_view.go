@@ -26,7 +26,7 @@ func View(name ...string) *gview.View {
 		instanceName = name[0]
 	}
 	instanceKey := fmt.Sprintf("%s.%s", frameCoreComponentNameViewer, instanceName)
-	return instance.GetOrSetFuncLock(instanceKey, func() any {
+	return instance.GetOrSetFuncLock(instanceKey, func() interface{} {
 		return getViewInstance(instanceName)
 	}).(*gview.View)
 }
@@ -43,7 +43,7 @@ func getViewInstance(name ...string) *gview.View {
 	view := gview.Instance(instanceName)
 	if Config().Available(ctx) {
 		var (
-			configMap      map[string]any
+			configMap      map[string]interface{}
 			configNodeName = consts.ConfigNodeNameViewer
 		)
 		if configMap, err = Config().Data(ctx); err != nil {

@@ -23,7 +23,7 @@ type utilAdmin struct{}
 
 // Index shows the administration page.
 func (p *utilAdmin) Index(r *Request) {
-	data := map[string]any{
+	data := map[string]interface{}{
 		"pid":  gproc.Pid(),
 		"path": gfile.SelfPath(),
 		"uri":  strings.TrimRight(r.URL.Path, "/"),

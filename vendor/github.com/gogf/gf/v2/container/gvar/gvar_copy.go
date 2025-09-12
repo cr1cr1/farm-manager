@@ -22,7 +22,7 @@ func (v *Var) Clone() *Var {
 }
 
 // DeepCopy implements interface for deep copy of current type.
-func (v *Var) DeepCopy() any {
+func (v *Var) DeepCopy() interface{} {
 	if v == nil {
 		return nil
 	}

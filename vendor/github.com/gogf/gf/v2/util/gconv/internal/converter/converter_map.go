@@ -110,7 +110,7 @@ func (c *Converter) doMapConvert(
 		newTags = append(option.Tags, gtag.StructTagPriority...)
 	}
 	// Assert the common combination of types, and finally it uses reflection.
-	dataMap := make(map[string]any)
+	dataMap := make(map[string]interface{})
 	switch r := value.(type) {
 	case string:
 		// If it is a JSON string, automatically unmarshal it!
@@ -130,7 +130,7 @@ func (c *Converter) doMapConvert(
 		} else {
 			return nil, nil
 		}
-	case map[any]any:
+	case map[interface{}]interface{}:
 		recursiveOption := option
 		recursiveOption.Tags = newTags
 		for k, v := range r {
@@ -151,7 +151,7 @@ func (c *Converter) doMapConvert(
 				return nil, err
 			}
 		}
-	case map[any]string:
+	case map[interface{}]string:
 		for k, v := range r {
 			s, err := c.String(k)
 			if err != nil && !option.ContinueOnError {
@@ -159,7 +159,7 @@ func (c *Converter) doMapConvert(
 			}
 			dataMap[s] = v
 		}
-	case map[any]int:
+	case map[interface{}]int:
 		for k, v := range r {
 			s, err := c.String(k)
 			if err != nil && !option.ContinueOnError {
@@ -167,7 +167,7 @@ func (c *Converter) doMapConvert(
 			}
 			dataMap[s] = v
 		}
-	case map[any]uint:
+	case map[interface{}]uint:
 		for k, v := range r {
 			s, err := c.String(k)
 			if err != nil && !option.ContinueOnError {
@@ -175,7 +175,7 @@ func (c *Converter) doMapConvert(
 			}
 			dataMap[s] = v
 		}
-	case map[any]float32:
+	case map[interface{}]float32:
 		for k, v := range r {
 			s, err := c.String(k)
 			if err != nil && !option.ContinueOnError {
@@ -183,7 +183,7 @@ func (c *Converter) doMapConvert(
 			}
 			dataMap[s] = v
 		}
-	case map[any]float64:
+	case map[interface{}]float64:
 		for k, v := range r {
 			s, err := c.String(k)
 			if err != nil && !option.ContinueOnError {
@@ -215,7 +215,7 @@ func (c *Converter) doMapConvert(
 		for k, v := range r {
 			dataMap[k] = v
 		}
-	case map[string]any:
+	case map[string]interface{}:
 		if recursive == RecursiveTypeTrue {
 			recursiveOption := option
 			recursiveOption.Tags = newTags
@@ -238,7 +238,7 @@ func (c *Converter) doMapConvert(
 			// It returns the map directly without any changing.
 			return r, nil
 		}
-	case map[int]any:
+	case map[int]interface{}:
 		recursiveOption := option
 		recursiveOption.Tags = newTags
 		for k, v := range r {
@@ -286,15 +286,15 @@ func (c *Converter) doMapConvert(
 		}
 		reflectKind := reflectValue.Kind()
 		// If it is a pointer, we should find its real data type.
-		for reflectKind == reflect.Pointer {
+		for reflectKind == reflect.Ptr {
 			reflectValue = reflectValue.Elem()
 			reflectKind = reflectValue.Kind()
 		}
 		switch reflectKind {
 		// If `value` is type of array, it converts the value of even number index as its key and
 		// the value of odd number index as its corresponding value, for example:
-		// []string{"k1","v1","k2","v2"} => map[string]any{"k1":"v1", "k2":"v2"}
-		// []string{"k1","v1","k2"}      => map[string]any{"k1":"v1", "k2":nil}
+		// []string{"k1","v1","k2","v2"} => map[string]interface{}{"k1":"v1", "k2":"v2"}
+		// []string{"k1","v1","k2"}      => map[string]interface{}{"k1":"v1", "k2":nil}
 		case reflect.Slice, reflect.Array:
 			length := reflectValue.Len()
 			for i := 0; i < length; i += 2 {
@@ -324,7 +324,7 @@ func (c *Converter) doMapConvert(
 			if err != nil && !option.ContinueOnError {
 				return nil, err
 			}
-			if m, ok := convertedValue.(map[string]any); ok {
+			if m, ok := convertedValue.(map[string]interface{}); ok {
 				return m, nil
 			}
 			return nil, nil
@@ -337,7 +337,7 @@ func (c *Converter) doMapConvert(
 
 type doMapConvertForMapOrStructValueInput struct {
 	IsRoot          bool          // It returns directly if it is not root and with no recursive converting.
-	Value           any           // Current operation value.
+	Value           interface{}   // Current operation value.
 	RecursiveType   RecursiveType // The type from top function entry.
 	RecursiveOption bool          // Whether convert recursively for `current` operation.
 	Option          MapOption     // Map converting option.
@@ -361,7 +361,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 	}
 	reflectKind := reflectValue.Kind()
 	// If it is a pointer, we should find its real data type.
-	for reflectKind == reflect.Pointer {
+	for reflectKind == reflect.Ptr {
 		reflectValue = reflectValue.Elem()
 		reflectKind = reflectValue.Kind()
 	}
@@ -369,12 +369,12 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 	case reflect.Map:
 		var (
 			mapIter = reflectValue.MapRange()
-			dataMap = make(map[string]any)
+			dataMap = make(map[string]interface{})
 		)
 		for mapIter.Next() {
 			var (
 				mapKeyValue = mapIter.Value()
-				mapValue    any
+				mapValue    interface{}
 			)
 			switch {
 			case mapKeyValue.IsZero():
@@ -409,7 +409,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 		return dataMap, nil
 
 	case reflect.Struct:
-		var dataMap = make(map[string]any)
+		var dataMap = make(map[string]interface{})
 		// Map converting interface check.
 		if v, ok := in.Value.(localinterface.IMapStrAny); ok {
 			// Value copy, in case of concurrent safety.
@@ -488,7 +488,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 					rvAttrField = rvField
 					rvAttrKind  = rvField.Kind()
 				)
-				if rvAttrKind == reflect.Pointer {
+				if rvAttrKind == reflect.Ptr {
 					rvAttrField = rvField.Elem()
 					rvAttrKind = rvAttrField.Kind()
 				}
@@ -521,7 +521,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 						if err != nil && !in.Option.ContinueOnError {
 							return nil, err
 						}
-						if m, ok := anonymousValue.(map[string]any); ok {
+						if m, ok := anonymousValue.(map[string]interface{}); ok {
 							for k, v := range m {
 								dataMap[k] = v
 							}
@@ -566,7 +566,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 						dataMap[mapKey] = rvAttrField.Interface()
 						break
 					}
-					array := make([]any, length)
+					array := make([]interface{}, length)
 					for arrayIndex := 0; arrayIndex < length; arrayIndex++ {
 						array[arrayIndex], err = c.doMapConvertForMapOrStructValue(
 							doMapConvertForMapOrStructValueInput{
@@ -585,7 +585,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 				case reflect.Map:
 					var (
 						mapIter   = rvAttrField.MapRange()
-						nestedMap = make(map[string]any)
+						nestedMap = make(map[string]interface{})
 					)
 					for mapIter.Next() {
 						s, err := c.String(mapIter.Key().Interface())
@@ -633,7 +633,7 @@ func (c *Converter) doMapConvertForMapOrStructValue(in doMapConvertForMapOrStruc
 		if length == 0 {
 			break
 		}
-		array := make([]any, reflectValue.Len())
+		array := make([]interface{}, reflectValue.Len())
 		for i := 0; i < length; i++ {
 			array[i], err = c.doMapConvertForMapOrStructValue(doMapConvertForMapOrStructValueInput{
 				IsRoot:          false,

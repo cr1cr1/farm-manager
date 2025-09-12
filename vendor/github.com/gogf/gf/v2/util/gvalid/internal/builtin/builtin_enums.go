@@ -49,7 +49,7 @@ func (r RuleEnums) Run(in RunInput) error {
 		typeName = in.ValueType.Name()
 		typeKind = in.ValueType.Kind()
 	)
-	if typeKind == reflect.Slice || typeKind == reflect.Pointer {
+	if typeKind == reflect.Slice || typeKind == reflect.Ptr {
 		pkgPath = in.ValueType.Elem().PkgPath()
 		typeName = in.ValueType.Elem().Name()
 	}
@@ -71,7 +71,7 @@ func (r RuleEnums) Run(in RunInput) error {
 			typeId,
 		)
 	}
-	var enumsValues = make([]any, 0)
+	var enumsValues = make([]interface{}, 0)
 	if err := json.Unmarshal([]byte(tagEnums), &enumsValues); err != nil {
 		return err
 	}

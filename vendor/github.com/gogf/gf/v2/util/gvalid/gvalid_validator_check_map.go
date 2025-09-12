@@ -17,7 +17,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-func (v *Validator) doCheckMap(ctx context.Context, params any) Error {
+func (v *Validator) doCheckMap(ctx context.Context, params interface{}) Error {
 	if params == nil {
 		return nil
 	}
@@ -88,7 +88,7 @@ func (v *Validator) doCheckMap(ctx context.Context, params any) Error {
 		}
 	}
 	var (
-		value     any
+		value     interface{}
 		validator = v.Clone()
 	)
 

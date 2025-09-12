@@ -20,10 +20,10 @@ import (
 )
 
 // Decode converts INI format to map.
-func Decode(data []byte) (res map[string]any, err error) {
-	res = make(map[string]any)
+func Decode(data []byte) (res map[string]interface{}, err error) {
+	res = make(map[string]interface{})
 	var (
-		fieldMap    = make(map[string]any)
+		fieldMap    = make(map[string]interface{})
 		bytesReader = bytes.NewReader(data)
 		bufioReader = bufio.NewReader(bytesReader)
 		section     string
@@ -58,7 +58,7 @@ func Decode(data []byte) (res map[string]any, err error) {
 				lastSection = section
 			} else if lastSection != section {
 				lastSection = section
-				fieldMap = make(map[string]any)
+				fieldMap = make(map[string]interface{})
 			}
 			haveSection = true
 		} else if !haveSection {
@@ -79,22 +79,22 @@ func Decode(data []byte) (res map[string]any, err error) {
 }
 
 // Encode converts map to INI format.
-func Encode(data map[string]any) (res []byte, err error) {
+func Encode(data map[string]interface{}) (res []byte, err error) {
 	var (
 		n  int
 		w  = new(bytes.Buffer)
-		m  map[string]any
+		m  map[string]interface{}
 		ok bool
 	)
 	for section, item := range data {
 		// Section key-value pairs.
-		if m, ok = item.(map[string]any); ok {
-			n, err = fmt.Fprintf(w, "[%s]\n", section)
+		if m, ok = item.(map[string]interface{}); ok {
+			n, err = w.WriteString(fmt.Sprintf("[%s]\n", section))
 			if err != nil || n == 0 {
 				return nil, gerror.Wrapf(err, "w.WriteString failed")
 			}
 			for k, v := range m {
-				if n, err = fmt.Fprintf(w, "%s=%v\n", k, v); err != nil || n == 0 {
+				if n, err = w.WriteString(fmt.Sprintf("%s=%v\n", k, v)); err != nil || n == 0 {
 					return nil, gerror.Wrapf(err, "w.WriteString failed")
 				}
 			}
@@ -102,7 +102,7 @@ func Encode(data map[string]any) (res []byte, err error) {
 		}
 		// Simple key-value pairs.
 		for k, v := range data {
-			if n, err = fmt.Fprintf(w, "%s=%v\n", k, v); err != nil || n == 0 {
+			if n, err = w.WriteString(fmt.Sprintf("%s=%v\n", k, v)); err != nil || n == 0 {
 				return nil, gerror.Wrapf(err, "w.WriteString failed")
 			}
 		}

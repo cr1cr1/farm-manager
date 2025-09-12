@@ -9,9 +9,6 @@ package gstr
 import (
 	"strings"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	"github.com/gogf/gf/v2/internal/utils"
 )
 
@@ -43,7 +40,7 @@ func LcFirst(s string) string {
 
 // UcWords uppercase the first character of each word in a string.
 func UcWords(str string) string {
-	return cases.Title(language.Und).String(str)
+	return strings.Title(str)
 }
 
 // IsLetterLower tests whether the given byte b is in lower case.

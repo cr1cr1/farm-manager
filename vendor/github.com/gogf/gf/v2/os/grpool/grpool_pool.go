@@ -106,7 +106,7 @@ func (p *Pool) asynchronousWorker() {
 	defer p.count.Add(-1)
 
 	var (
-		listItem any
+		listItem interface{}
 		poolItem *localPoolItem
 	)
 	// Harding working, one by one, job never empty, worker never die.

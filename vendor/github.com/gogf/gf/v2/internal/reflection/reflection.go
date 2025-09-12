@@ -19,7 +19,7 @@ type OriginValueAndKindOutput struct {
 }
 
 // OriginValueAndKind retrieves and returns the original reflect value and kind.
-func OriginValueAndKind(value any) (out OriginValueAndKindOutput) {
+func OriginValueAndKind(value interface{}) (out OriginValueAndKindOutput) {
 	if v, ok := value.(reflect.Value); ok {
 		out.InputValue = v
 	} else {
@@ -28,7 +28,7 @@ func OriginValueAndKind(value any) (out OriginValueAndKindOutput) {
 	out.InputKind = out.InputValue.Kind()
 	out.OriginValue = out.InputValue
 	out.OriginKind = out.InputKind
-	for out.OriginKind == reflect.Pointer {
+	for out.OriginKind == reflect.Ptr {
 		out.OriginValue = out.OriginValue.Elem()
 		out.OriginKind = out.OriginValue.Kind()
 	}
@@ -43,7 +43,7 @@ type OriginTypeAndKindOutput struct {
 }
 
 // OriginTypeAndKind retrieves and returns the original reflect type and kind.
-func OriginTypeAndKind(value any) (out OriginTypeAndKindOutput) {
+func OriginTypeAndKind(value interface{}) (out OriginTypeAndKindOutput) {
 	if value == nil {
 		return
 	}
@@ -59,7 +59,7 @@ func OriginTypeAndKind(value any) (out OriginTypeAndKindOutput) {
 	out.InputKind = out.InputType.Kind()
 	out.OriginType = out.InputType
 	out.OriginKind = out.InputKind
-	for out.OriginKind == reflect.Pointer {
+	for out.OriginKind == reflect.Ptr {
 		out.OriginType = out.OriginType.Elem()
 		out.OriginKind = out.OriginType.Kind()
 	}
@@ -67,7 +67,7 @@ func OriginTypeAndKind(value any) (out OriginTypeAndKindOutput) {
 }
 
 // ValueToInterface converts reflect value to its interface type.
-func ValueToInterface(v reflect.Value) (value any, ok bool) {
+func ValueToInterface(v reflect.Value) (value interface{}, ok bool) {
 	if v.IsValid() && v.CanInterface() {
 		return v.Interface(), true
 	}
@@ -84,7 +84,7 @@ func ValueToInterface(v reflect.Value) (value any, ok bool) {
 		return v.Complex(), true
 	case reflect.String:
 		return v.String(), true
-	case reflect.Pointer:
+	case reflect.Ptr:
 		return ValueToInterface(v.Elem())
 	case reflect.Interface:
 		return ValueToInterface(v.Elem())

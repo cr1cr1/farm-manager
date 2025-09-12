@@ -81,7 +81,7 @@ func SetTimeZone(zone string) (err error) {
 // ToLocation converts current time to specified location.
 func (t *Time) ToLocation(location *time.Location) *Time {
 	newTime := t.Clone()
-	newTime.Time = newTime.In(location)
+	newTime.Time = newTime.Time.In(location)
 	return newTime
 }
 

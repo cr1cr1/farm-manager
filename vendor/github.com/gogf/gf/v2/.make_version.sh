@@ -1,19 +1,4 @@
 #!/usr/bin/env bash
-
-# Function to detect OS and set sed parameters
-setup_sed() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        SED_INPLACE="sed -i ''"
-    else
-        # Linux/Windows Git Bash
-        SED_INPLACE="sed -i"
-    fi
-}
-
-# Initialize sed command
-setup_sed
-
 if [ $# -ne 2 ]; then
     echo "Parameter exception, please execute in the format of $0 [directory] [version number]"
     echo "PS：$0 ./ v2.4.0"
@@ -43,10 +28,10 @@ fi
 
 if [[ true ]]; then
     # Use sed to replace the version number in version.go
-    $SED_INPLACE 's/VERSION = ".*"/VERSION = "'${newVersion}'"/' version.go
+    sed -i '' 's/VERSION = ".*"/VERSION = "'${newVersion}'"/' version.go
 
     # Use sed to replace the version number in README.MD
-    $SED_INPLACE 's/version=[^"]*/version='${newVersion}'/' README.MD
+    sed -i '' 's/version=[^"]*/version='${newVersion}'/' README.MD
 fi
 
 if [ -f "go.work" ]; then
@@ -82,7 +67,7 @@ for file in `find ${workdir} -name go.mod`; do
     fi
     go mod tidy
     # Remove toolchain line if exists
-    $SED_INPLACE '/^toolchain/d' go.mod
+    sed -i '' '/^toolchain/d' go.mod
 
     # Upgrading only GoFrame related libraries, sometimes even if a version number is specified, 
     # it may not be possible to successfully upgrade. Please confirm before submitting the code
@@ -90,7 +75,7 @@ for file in `find ${workdir} -name go.mod`; do
     go list -f "{{if and (not .Indirect) (not .Main)}}{{.Path}}@${newVersion}{{end}}" -m all | grep "^github.com/gogf/gf" | xargs -L1 go get -v 
     go mod tidy
     # Remove toolchain line if exists
-    $SED_INPLACE '/^toolchain/d' go.mod
+    sed -i '' '/^toolchain/d' go.mod
     if [ $goModPath = "./cmd/gf" ]; then
         go mod edit -dropreplace github.com/gogf/gf/v2
         go mod edit -dropreplace github.com/gogf/gf/contrib/drivers/clickhouse/v2

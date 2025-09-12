@@ -413,7 +413,7 @@ func (c *Converter) doConvertForDefault(in doConvertInput, option ConvertOption)
 			}
 		}()
 		switch referReflectValue.Kind() {
-		case reflect.Pointer:
+		case reflect.Ptr:
 			// Type converting for custom type pointers.
 			// Eg:
 			// type PayMode int

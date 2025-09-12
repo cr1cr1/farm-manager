@@ -34,10 +34,10 @@ func Database(name ...string) gdb.DB {
 		group = name[0]
 	}
 	instanceKey := fmt.Sprintf("%s.%s", frameCoreComponentNameDatabase, group)
-	db := instance.GetOrSetFuncLock(instanceKey, func() any {
+	db := instance.GetOrSetFuncLock(instanceKey, func() interface{} {
 		// It ignores returned error to avoid file no found error while it's not necessary.
 		var (
-			configMap     map[string]any
+			configMap     map[string]interface{}
 			configNodeKey = consts.ConfigNodeNameDatabase
 		)
 		// It firstly searches the configuration of the instance name.
@@ -71,19 +71,19 @@ func Database(name ...string) gdb.DB {
 		}
 
 		if len(configMap) == 0 {
-			configMap = make(map[string]any)
+			configMap = make(map[string]interface{})
 		}
 		// Parse `m` as map-slice and adds it to global configurations for package gdb.
 		for g, groupConfig := range configMap {
 			cg := gdb.ConfigGroup{}
 			switch value := groupConfig.(type) {
-			case []any:
+			case []interface{}:
 				for _, v := range value {
 					if node := parseDBConfigNode(v); node != nil {
 						cg = append(cg, *node)
 					}
 				}
-			case map[string]any:
+			case map[string]interface{}:
 				if node := parseDBConfigNode(value); node != nil {
 					cg = append(cg, *node)
 				}
@@ -128,7 +128,7 @@ func Database(name ...string) gdb.DB {
 		if db, err := gdb.NewByGroup(name...); err == nil {
 			// Initialize logger for ORM.
 			var (
-				loggerConfigMap map[string]any
+				loggerConfigMap map[string]interface{}
 				loggerNodeName  = fmt.Sprintf("%s.%s", configNodeKey, consts.ConfigNodeNameLogger)
 			)
 			if v, _ := Config().Get(ctx, loggerNodeName); !v.IsEmpty() {
@@ -151,6 +151,7 @@ func Database(name ...string) gdb.DB {
 			// If panics, often because it does not find its configuration for given group.
 			panic(err)
 		}
+		return nil
 	})
 	if db != nil {
 		return db.(gdb.DB)
@@ -158,8 +159,8 @@ func Database(name ...string) gdb.DB {
 	return nil
 }
 
-func parseDBConfigNode(value any) *gdb.ConfigNode {
-	nodeMap, ok := value.(map[string]any)
+func parseDBConfigNode(value interface{}) *gdb.ConfigNode {
+	nodeMap, ok := value.(map[string]interface{})
 	if !ok {
 		return nil
 	}

@@ -20,11 +20,11 @@ import (
 	"github.com/gogf/gf/v2/util/gconv/internal/localinterface"
 )
 
-func (c *Converter) String(anyInput any) (string, error) {
-	if empty.IsNil(anyInput) {
+func (c *Converter) String(any any) (string, error) {
+	if empty.IsNil(any) {
 		return "", nil
 	}
-	switch value := anyInput.(type) {
+	switch value := any.(type) {
 	case int:
 		return strconv.Itoa(value), nil
 	case int8:
@@ -106,7 +106,7 @@ func (c *Converter) String(anyInput any) (string, error) {
 			}
 		case reflect.String:
 			return rv.String(), nil
-		case reflect.Pointer:
+		case reflect.Ptr:
 			if rv.IsNil() {
 				return "", nil
 			}

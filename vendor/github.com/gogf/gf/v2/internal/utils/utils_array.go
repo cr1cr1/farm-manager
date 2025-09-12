@@ -10,10 +10,10 @@ import "reflect"
 
 // IsArray checks whether given value is array/slice.
 // Note that it uses reflect internally implementing this feature.
-func IsArray(value any) bool {
+func IsArray(value interface{}) bool {
 	rv := reflect.ValueOf(value)
 	kind := rv.Kind()
-	if kind == reflect.Pointer {
+	if kind == reflect.Ptr {
 		rv = rv.Elem()
 		kind = rv.Kind()
 	}

@@ -12,14 +12,14 @@ import (
 )
 
 // Carrier is the storage medium used by a TextMapPropagator.
-type Carrier map[string]any
+type Carrier map[string]interface{}
 
 // NewCarrier creates and returns a Carrier.
-func NewCarrier(data ...map[string]any) Carrier {
+func NewCarrier(data ...map[string]interface{}) Carrier {
 	if len(data) > 0 && data[0] != nil {
 		return data[0]
 	}
-	return make(map[string]any)
+	return make(map[string]interface{})
 }
 
 // Get returns the value associated with the passed key.

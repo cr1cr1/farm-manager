@@ -194,7 +194,7 @@ func (l *Logger) print(ctx context.Context, level int, stack string, values ...a
 		// Context values.
 		if len(l.config.CtxKeys) > 0 {
 			for _, ctxKey := range l.config.CtxKeys {
-				var ctxValue any
+				var ctxValue interface{}
 				if ctxValue = ctx.Value(ctxKey); ctxValue == nil {
 					ctxValue = ctx.Value(gctx.StrKey(gconv.String(ctxKey)))
 				}
@@ -355,7 +355,7 @@ func (l *Logger) getFpFromPool(ctx context.Context, path string) *gfpool.File {
 }
 
 // printStd prints content `s` without stack.
-func (l *Logger) printStd(ctx context.Context, level int, values ...any) {
+func (l *Logger) printStd(ctx context.Context, level int, values ...interface{}) {
 	// nil logger, print nothing
 	if l == nil {
 		return
@@ -364,7 +364,7 @@ func (l *Logger) printStd(ctx context.Context, level int, values ...any) {
 }
 
 // printErr prints content `s` with stack check.
-func (l *Logger) printErr(ctx context.Context, level int, values ...any) {
+func (l *Logger) printErr(ctx context.Context, level int, values ...interface{}) {
 	// nil logger, print nothing
 	if l == nil {
 		return
@@ -378,7 +378,7 @@ func (l *Logger) printErr(ctx context.Context, level int, values ...any) {
 }
 
 // format formats `values` using fmt.Sprintf.
-func (l *Logger) format(format string, values ...any) string {
+func (l *Logger) format(format string, values ...interface{}) string {
 	return fmt.Sprintf(format, values...)
 }
 

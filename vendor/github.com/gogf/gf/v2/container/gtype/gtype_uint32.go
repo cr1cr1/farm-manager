@@ -71,13 +71,13 @@ func (v *Uint32) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalValue is an interface implement which sets any type of value for `v`.
-func (v *Uint32) UnmarshalValue(value any) error {
+func (v *Uint32) UnmarshalValue(value interface{}) error {
 	v.Set(gconv.Uint32(value))
 	return nil
 }
 
 // DeepCopy implements interface for deep copy of current type.
-func (v *Uint32) DeepCopy() any {
+func (v *Uint32) DeepCopy() interface{} {
 	if v == nil {
 		return nil
 	}

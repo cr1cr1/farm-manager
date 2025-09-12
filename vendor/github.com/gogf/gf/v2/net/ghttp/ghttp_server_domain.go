@@ -30,7 +30,7 @@ func (s *Server) Domain(domains string) *Domain {
 }
 
 // BindHandler binds the handler for the specified pattern.
-func (d *Domain) BindHandler(pattern string, handler any) {
+func (d *Domain) BindHandler(pattern string, handler interface{}) {
 	for domain := range d.domains {
 		d.server.BindHandler(pattern+"@"+domain, handler)
 	}
@@ -49,7 +49,7 @@ func (d *Domain) doBindHandler(ctx context.Context, in doBindHandlerInput) {
 }
 
 // BindObject binds the object for the specified pattern.
-func (d *Domain) BindObject(pattern string, obj any, methods ...string) {
+func (d *Domain) BindObject(pattern string, obj interface{}, methods ...string) {
 	for domain := range d.domains {
 		d.server.BindObject(pattern+"@"+domain, obj, methods...)
 	}
@@ -69,7 +69,7 @@ func (d *Domain) doBindObject(ctx context.Context, in doBindObjectInput) {
 }
 
 // BindObjectMethod binds the method for the specified pattern.
-func (d *Domain) BindObjectMethod(pattern string, obj any, method string) {
+func (d *Domain) BindObjectMethod(pattern string, obj interface{}, method string) {
 	for domain := range d.domains {
 		d.server.BindObjectMethod(pattern+"@"+domain, obj, method)
 	}
@@ -89,7 +89,7 @@ func (d *Domain) doBindObjectMethod(ctx context.Context, in doBindObjectMethodIn
 }
 
 // BindObjectRest binds the RESTful API for the specified pattern.
-func (d *Domain) BindObjectRest(pattern string, obj any) {
+func (d *Domain) BindObjectRest(pattern string, obj interface{}) {
 	for domain := range d.domains {
 		d.server.BindObjectRest(pattern+"@"+domain, obj)
 	}
