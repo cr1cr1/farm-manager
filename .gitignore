@@ -15,3 +15,4 @@ coverage*
 .DS_Store
 
 /farm-manager
+__debug_bin*
