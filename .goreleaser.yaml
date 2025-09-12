@@ -16,6 +16,7 @@ builds:
       # - arm64
     flags:
       - -trimpath
+      - -mod=vendor
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -24,11 +25,12 @@ builds:
 
 archives:
   - id: archives
-    builds:
+    ids:
       - farm-manager
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     files:
       - db/migrations/*.sql
       - public/**/*
