@@ -1,6 +1,0 @@
-tailwind-merge/
-playground
-.idea
-.direnv
-*.cov
-*.out
