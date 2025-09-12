@@ -33,6 +33,11 @@ func (d *Dashboard) DashboardGet(r *ghttp.Request) {
 
 // PingFragment returns HTML containing an element with id=content for DataStar morphing.
 func (d *Dashboard) PingFragment(r *ghttp.Request) {
+	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	r.Response.WriteStatus(http.StatusOK)
-	r.Response.Write(`<section id="content" class="card"><h3>Pong</h3><p>Hypermedia fragment loaded at ` + r.GetClientIp() + `.</p></section>`)
+	r.Response.Write(`<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<h3 class="text-lg font-semibold mb-2">Pong! 🏓</h3>
+		<p class="text-muted-foreground">Hypermedia fragment loaded at ` + r.GetClientIp() + `.</p>
+		<p class="text-sm text-muted-foreground mt-2">This content was dynamically loaded via DataStar.</p>
+	</div>`)
 }
