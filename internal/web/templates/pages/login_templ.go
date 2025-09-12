@@ -553,7 +553,7 @@ func LoginFragment(basePath string, csrf string, errs map[string]string, usernam
 }
 
 // LoginPage composes BaseLayout + LoginContent for initial full-page load (no nav).
-func LoginPage(basePath string, title string, csrf string, errs map[string]string, username string) templ.Component {
+func LoginPage(basePath, title, csrf string, errs map[string]string, username string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -592,7 +592,7 @@ func LoginPage(basePath string, title string, csrf string, errs map[string]strin
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Root(basePath, title, false, csrf, 0).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Root(basePath, title, false, csrf, username, "system").Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

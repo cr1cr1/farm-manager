@@ -11,7 +11,7 @@ import (
 )
 
 // ProfilePasswordFragment returns the password change section for DataStar fragment replacement
-templ ProfilePasswordFragment(basePath string, csrf string, errs map[string]string, success string) {
+templ ProfilePasswordFragment(basePath, csrf string, errs map[string]string, success string) {
 	<div id="profile-password-container" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
 		{{
 			signals := utilsc.Signals("profile_password_form", map[string]string{
@@ -116,12 +116,11 @@ templ ProfilePasswordFragment(basePath string, csrf string, errs map[string]stri
 }
 
 // ProfileContent is the fragment (no layout) for the profile page main area.
-templ ProfileContent(basePath string, csrf string, errs map[string]string, username string, success string, userTheme int) {
+templ ProfileContent(basePath, csrf string, errs map[string]string, success, userTheme string) {
 	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
 		<div class="mb-4">
 			<h2 class="text-2xl font-semibold text-foreground">User Profile</h2>
 		</div>
-		<p class="text-muted-foreground"><strong>Username:</strong> { username }</p>
 	</div>
 	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
 		<div class="mb-4">
@@ -153,8 +152,8 @@ templ ProfileContent(basePath string, csrf string, errs map[string]string, usern
 }
 
 // ProfilePage composes BaseLayout + ProfileContent for initial load.
-templ ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string, userTheme int) {
-	@layouts.Root(basePath, title, true, csrf, userTheme) {
-		@ProfileContent(basePath, csrf, errs, username, success, userTheme)
+templ ProfilePage(basePath, title, csrf string, errs map[string]string, success, username, userTheme string) {
+	@layouts.Root(basePath, title, true, csrf, username, userTheme) {
+		@ProfileContent(basePath, csrf, errs, success, userTheme)
 	}
 }

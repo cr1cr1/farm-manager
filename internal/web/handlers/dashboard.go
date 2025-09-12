@@ -24,14 +24,10 @@ type Dashboard struct {
 
 // DashboardGet renders the blank dashboard shell with a placeholder area and demo button.
 func (d *Dashboard) DashboardGet(r *ghttp.Request) {
-	username, _ := middleware.CurrentUsername(r)
-
-	// Load user to get theme preference
-	var userTheme int
-	if username != "" {
-		if u, err := d.Repo.FindByUsername(r.GetCtx(), username); err == nil {
-			userTheme = u.Theme
-		}
+	user, ok := middleware.CurrentUser(r)
+	if !ok {
+		r.Response.RedirectTo(middleware.BasePath() + "/login")
+		return
 	}
 
 	_ = middleware.TemplRender(
@@ -40,12 +36,11 @@ func (d *Dashboard) DashboardGet(r *ghttp.Request) {
 			middleware.BasePath(),
 			"Dashboard",
 			middleware.CsrfToken(r),
-			userTheme,
+			user.Username,
+			ThemeToString(user.Theme),
 		),
 	)
-}
-
-// PingFragment returns HTML containing an element with id=content for DataStar morphing.
+} // PingFragment returns HTML containing an element with id=content for DataStar morphing.
 func (d *Dashboard) PingFragment(r *ghttp.Request) {
 	r.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	r.Response.WriteStatus(http.StatusOK)

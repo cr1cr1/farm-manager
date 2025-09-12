@@ -22,7 +22,6 @@ github.com/coreycole/datastarui/components/button
 github.com/coreycole/datastarui/components/form
 github.com/coreycole/datastarui/components/input
 github.com/coreycole/datastarui/components/label
-github.com/coreycole/datastarui/components/themetoggle
 github.com/coreycole/datastarui/utils
 # github.com/dustin/go-humanize v1.0.1
 ## explicit; go 1.16

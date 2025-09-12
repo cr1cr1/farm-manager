@@ -26,8 +26,8 @@ templ DashboardContent(basePath string, csrf string) {
 }
 
 // DashboardPage composes the layout + content for initial full-page load.
-templ DashboardPage(basePath string, title string, csrf string, userTheme int) {
-	@layouts.Root(basePath, title, true, csrf, userTheme) {
+templ DashboardPage(basePath, title, csrf, username, userTheme string) {
+	@layouts.Root(basePath, title, true, csrf, username, userTheme) {
 		@DashboardContent(basePath, csrf)
 	}
 }

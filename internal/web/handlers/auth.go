@@ -30,7 +30,7 @@ func RegisterAuthRoutes(group *ghttp.RouterGroup, repo data.UserRepo) {
 
 // LoginGet renders the login page. If already authenticated, redirects to /app.
 func (h *Auth) LoginGet(r *ghttp.Request) {
-	if u, ok := middleware.CurrentUsername(r); ok && u != "" {
+	if _, ok := middleware.CurrentUser(r); ok {
 		r.Response.RedirectTo(middleware.BasePath())
 		return
 	}
@@ -80,7 +80,7 @@ func (h *Auth) LoginPost(r *ghttp.Request) {
 		} else {
 			if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) == nil {
 				// Success
-				middleware.SetLoggedIn(r, u.Username)
+				middleware.SetLoggedIn(r, u)
 				middleware.SetNoCache(r)
 
 				if isDataStarRequest {

@@ -19,7 +19,7 @@ import (
 )
 
 // ProfilePasswordFragment returns the password change section for DataStar fragment replacement
-func ProfilePasswordFragment(basePath string, csrf string, errs map[string]string, success string) templ.Component {
+func ProfilePasswordFragment(basePath, csrf string, errs map[string]string, success string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -423,7 +423,7 @@ func ProfilePasswordFragment(basePath string, csrf string, errs map[string]strin
 }
 
 // ProfileContent is the fragment (no layout) for the profile page main area.
-func ProfileContent(basePath string, csrf string, errs map[string]string, username string, success string, userTheme int) templ.Component {
+func ProfileContent(basePath, csrf string, errs map[string]string, success, userTheme string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -444,24 +444,11 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h2 class=\"text-2xl font-semibold text-foreground\">User Profile</h2></div><p class=\"text-muted-foreground\"><strong>Username:</strong> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h2 class=\"text-2xl font-semibold text-foreground\">User Profile</h2></div></div><div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h3 class=\"text-lg font-semibold text-foreground\">Appearance</h3></div><p class=\"text-sm text-muted-foreground mb-4\">Choose how Farm Manager looks to you.</p><div id=\"theme-status\" class=\"mb-4\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(username)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 124, Col: 72}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p></div><div class=\"bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6\"><div class=\"mb-4\"><h3 class=\"text-lg font-semibold text-foreground\">Appearance</h3></div><p class=\"text-sm text-muted-foreground mb-4\">Choose how Farm Manager looks to you.</p><div id=\"theme-status\" class=\"mb-4\"></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Var17 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var16 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -473,20 +460,20 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 138, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/pages/profile.templ`, Line: 137, Col: 54}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"><div class=\"flex items-center justify-between\"><label class=\"text-sm font-medium text-foreground\">Theme</label><div class=\"flex items-center space-x-2\"><span class=\"text-sm text-muted-foreground\" data-text=\"$theme === 'light' ? 'Light' : $theme === 'dark' ? 'Dark' : 'System'\"></span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\"><div class=\"flex items-center justify-between\"><label class=\"text-sm font-medium text-foreground\">Theme</label><div class=\"flex items-center space-x-2\"><span class=\"text-sm text-muted-foreground\" data-text=\"$theme === 'light' ? 'Light' : $theme === 'dark' ? 'Dark' : 'System'\"></span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -498,7 +485,7 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -509,11 +496,11 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 			Attributes: templ.Attributes{
 				"data-on-submit": "@post('" + basePath + "/profile/theme', { contentType: 'form', target: '#theme-status' })",
 			},
-		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var17), templ_7745c5c3_Buffer)
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -526,7 +513,7 @@ func ProfileContent(basePath string, csrf string, errs map[string]string, userna
 }
 
 // ProfilePage composes BaseLayout + ProfileContent for initial load.
-func ProfilePage(basePath string, title string, csrf string, errs map[string]string, username string, success string, userTheme int) templ.Component {
+func ProfilePage(basePath, title, csrf string, errs map[string]string, success, username, userTheme string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -542,12 +529,12 @@ func ProfilePage(basePath string, title string, csrf string, errs map[string]str
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var20 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var19 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -559,13 +546,13 @@ func ProfilePage(basePath string, title string, csrf string, errs map[string]str
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = ProfileContent(basePath, csrf, errs, username, success, userTheme).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = ProfileContent(basePath, csrf, errs, success, userTheme).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf, userTheme).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Root(basePath, title, true, csrf, username, userTheme).Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

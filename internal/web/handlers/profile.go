@@ -55,18 +55,15 @@ func RegisterProfileRoutes(group *ghttp.RouterGroup, repo data.UserRepo) {
 
 // ProfileGet renders the profile page.
 func (p *Profile) ProfileGet(r *ghttp.Request) {
-	username, _ := middleware.CurrentUsername(r)
+	user, ok := middleware.CurrentUser(r)
+	if !ok {
+		r.Response.RedirectTo(middleware.BasePath() + "/login")
+		return
+	}
+
 	csrf := middleware.CsrfToken(r)
 	errs := map[string]string{}
 	success := ""
-
-	// Load user to get theme preference
-	var userTheme int
-	if username != "" {
-		if u, err := p.Repo.FindByUsername(r.GetCtx(), username); err == nil {
-			userTheme = u.Theme
-		}
-	}
 
 	_ = middleware.TemplRender(
 		r,
@@ -75,9 +72,9 @@ func (p *Profile) ProfileGet(r *ghttp.Request) {
 			"Profile",
 			csrf,
 			errs,
-			username,
 			success,
-			userTheme,
+			user.Username,
+			ThemeToString(user.Theme),
 		),
 	)
 }
@@ -85,8 +82,8 @@ func (p *Profile) ProfileGet(r *ghttp.Request) {
 // PasswordPost updates the current user's password after validation.
 func (p *Profile) PasswordPost(r *ghttp.Request) {
 	// CSRF is validated by middleware.Csrf()
-	username, ok := middleware.CurrentUsername(r)
-	if !ok || username == "" {
+	user, ok := middleware.CurrentUser(r)
+	if !ok {
 		r.Response.RedirectTo(middleware.BasePath() + "/login")
 		return
 	}
@@ -108,26 +105,20 @@ func (p *Profile) PasswordPost(r *ghttp.Request) {
 
 	success := ""
 	if len(errs) == 0 {
-		u, err := p.Repo.FindByUsername(r.GetCtx(), username)
-		if err != nil {
-			g.Log().Errorf(r.GetCtx(), "find user: %v", err)
-			errs["form"] = "Unable to update password"
+		if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(current)) != nil {
+			errs["current_password"] = "Current password is incorrect"
 		} else {
-			if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(current)) != nil {
-				errs["current_password"] = "Current password is incorrect"
+			hash, err := bcrypt.GenerateFromPassword([]byte(newpw), bcrypt.DefaultCost)
+			if err != nil {
+				g.Log().Errorf(r.GetCtx(), "hash password: %v", err)
+				errs["form"] = "Unable to update password"
 			} else {
-				hash, err := bcrypt.GenerateFromPassword([]byte(newpw), bcrypt.DefaultCost)
-				if err != nil {
-					g.Log().Errorf(r.GetCtx(), "hash password: %v", err)
+				if err := p.Repo.UpdatePassword(r.GetCtx(), user.ID, string(hash), false); err != nil {
+					g.Log().Errorf(r.GetCtx(), "update password: %v", err)
 					errs["form"] = "Unable to update password"
 				} else {
-					if err := p.Repo.UpdatePassword(r.GetCtx(), u.ID, string(hash), false); err != nil {
-						g.Log().Errorf(r.GetCtx(), "update password: %v", err)
-						errs["form"] = "Unable to update password"
-					} else {
-						middleware.SetNoCache(r)
-						success = "Password updated"
-					}
+					middleware.SetNoCache(r)
+					success = "Password updated"
 				}
 			}
 		}
@@ -147,22 +138,14 @@ func (p *Profile) PasswordPost(r *ghttp.Request) {
 // ThemePost updates the current user's theme preference.
 func (p *Profile) ThemePost(r *ghttp.Request) {
 	// CSRF is validated by middleware.Csrf()
-	username, ok := middleware.CurrentUsername(r)
-	if !ok || username == "" {
+	user, ok := middleware.CurrentUser(r)
+	if !ok {
 		r.Response.RedirectTo(middleware.BasePath() + "/login")
 		return
 	}
 
-	// Get user to update theme
-	u, err := p.Repo.FindByUsername(r.GetCtx(), username)
-	if err != nil {
-		g.Log().Errorf(r.GetCtx(), "find user: %v", err)
-		r.Response.WriteHeader(500)
-		return
-	}
-
 	// Update theme in database
-	if err := p.Repo.UpdateTheme(r.GetCtx(), u.ID, ParseTheme(r.Get("theme").String())); err != nil {
+	if err := p.Repo.UpdateTheme(r.GetCtx(), user.ID, ParseTheme(r.Get("theme").String())); err != nil {
 		g.Log().Errorf(r.GetCtx(), "update theme: %v", err)
 		r.Response.WriteHeader(500)
 		return
