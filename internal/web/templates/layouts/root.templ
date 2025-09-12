@@ -1,13 +1,15 @@
 package layouts
 
 import (
-	themetoggle "github.com/cr1cr1/farm-manager/internal/web/templates/components/themetoggle"
+	"github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/themetoggle"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/tooltip"
 	"path/filepath"
 	"time"
 )
 
 // Root provides the shared HTML skeleton.
-templ Root(basePath string, title string, showNav bool, csrf string, userTheme int) {
+templ Root(basePath string, title string, showNav bool, csrf, username, userTheme string) {
 	{{
 		// Find the hashed CSS file
 		cssFile := "/public/css/app.css" // fallback
@@ -78,10 +80,8 @@ templ Root(basePath string, title string, showNav bool, csrf string, userTheme i
 					let savedTheme = localStorage.getItem('theme');
 
 					// Check if user has a saved preference from database
-					if (userTheme && userTheme !== 0) {
-						const userThemeMap = {0: 'system', 1: 'dark', 2: 'light'};
-						savedTheme = userThemeMap[userTheme] || 'system';
-						// Update localStorage to match user's preference
+					if (userTheme && userTheme !== "") {
+						savedTheme = userTheme
 						localStorage.setItem('theme', savedTheme);
 					}
 
@@ -121,9 +121,24 @@ templ Root(basePath string, title string, showNav bool, csrf string, userTheme i
 								</div>
 								<div class="flex items-center space-x-2">
 									<nav class="flex items-center space-x-1">
-										@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{})
+										@tooltip.TooltipTrigger(tooltip.TooltipTriggerArgs{
+											ID:        "theme_tooltip_trigger",
+											TooltipID: "theme_tooltip",
+											Class:     "cursor-not-allowed",
+										}) {
+											@themetoggle.ThemeToggle(themetoggle.ThemeToggleArgs{})
+										}
+										@tooltip.TooltipContent(tooltip.TooltipContentArgs{
+											ID:        "theme_tooltip",
+											UseAnchor: true,
+											Side:      utils.AnchorSideBottom,
+											Align:     utils.AnchorAlignCenter,
+										}) {
+											<p class="whitespace-nowrap">To persist the change your theme, use the profile page.</p>
+										}
 									</nav>
 									if showNav {
+										<p class="text-muted-foreground">Welcome, <strong>{ username }</strong></p>
 										<form method="post" action={ basePath + "/logout" } class="logout-form">
 											<input type="hidden" name="csrf_token" value={ csrf }/>
 											<button type="submit" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 h-9 px-4 py-2">Logout</button>
