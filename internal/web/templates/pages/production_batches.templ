@@ -1,0 +1,206 @@
+package pages
+
+import (
+	"fmt"
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// ProductionBatchesPage renders the production batches management page
+templ ProductionBatchesPage(basePath, csrf, username, userTheme string, productionBatches []*domain.ProductionBatch) {
+	@layouts.Root(basePath, "Production Batch Management", true, csrf, username, userTheme) {
+		<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-2xl font-semibold text-foreground">Production Batch Management</h2>
+				@buttonc.Button(buttonc.ButtonArgs{
+					Variant: "default",
+					Attributes: templ.Attributes{
+						"data-on-click": "@get('" + basePath + "/management/production-batches/new', '#content')",
+					},
+				}) {
+					Add New Production Batch
+				}
+			</div>
+			if len(productionBatches) == 0 {
+				<div class="text-center py-8">
+					<p class="text-muted-foreground mb-4">No production batches found.</p>
+					@buttonc.Button(buttonc.ButtonArgs{
+						Variant: "default",
+						Attributes: templ.Attributes{
+							"data-on-click": "@get('" + basePath + "/management/production-batches/new', '#content')",
+						},
+					}) {
+						Create Your First Production Batch
+					}
+				</div>
+			} else {
+				<div class="overflow-x-auto">
+					<table class="w-full border-collapse">
+						<thead>
+							<tr class="border-b">
+								<th class="text-left p-2 font-medium">Flock ID</th>
+								<th class="text-left p-2 font-medium">Date Ready</th>
+								<th class="text-left p-2 font-medium">Number in Batch</th>
+								<th class="text-left p-2 font-medium">Weight Estimate</th>
+								<th class="text-left p-2 font-medium">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, batch := range productionBatches {
+								<tr class="border-b hover:bg-muted/50">
+									<td class="p-2">{ strconv.FormatInt(batch.FlockID, 10) }</td>
+									<td class="p-2">
+										if batch.DateReady != nil {
+											{ batch.DateReady.Format("2006-01-02") }
+										} else {
+											<span class="text-muted-foreground">-</span>
+										}
+									</td>
+									<td class="p-2">
+										if batch.NumberInBatch != nil {
+											{ strconv.Itoa(*batch.NumberInBatch) }
+										} else {
+											<span class="text-muted-foreground">-</span>
+										}
+									</td>
+									<td class="p-2">
+										if batch.WeightEstimate != nil {
+											{ fmt.Sprintf("%.2f", *batch.WeightEstimate) }
+										} else {
+											<span class="text-muted-foreground">-</span>
+										}
+									</td>
+									<td class="p-2">
+										<div class="flex gap-2">
+											@buttonc.Button(buttonc.ButtonArgs{
+												Variant: "outline",
+												Size:    "sm",
+												Attributes: templ.Attributes{
+													"data-on-click": "@get('" + basePath + "/management/production-batches/" + strconv.FormatInt(batch.BatchID, 10) + "', '#content')",
+												},
+											}) {
+												Edit
+											}
+											@buttonc.Button(buttonc.ButtonArgs{
+												Variant: "destructive",
+												Size:    "sm",
+												Attributes: templ.Attributes{
+													"data-on-click": "$confirm('Are you sure you want to delete this production batch?') && @delete('" + basePath + "/management/production-batches/" + strconv.FormatInt(batch.BatchID, 10) + "', {headers: {'X-CSRF-Token': '" + csrf + "'}})",
+												},
+											}) {
+												Delete
+											}
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+		<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+			<p class="text-muted-foreground">Select a production batch to edit or create a new one.</p>
+		</div>
+	}
+}
+
+// ProductionBatchesContent renders the production batches content for DataStar fragments
+templ ProductionBatchesContent(basePath, csrf string, productionBatches []*domain.ProductionBatch) {
+	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-2xl font-semibold text-foreground">🥚 Production Batch Management</h2>
+			@buttonc.Button(buttonc.ButtonArgs{
+				Variant: "default",
+				Attributes: templ.Attributes{
+					"data-on-click": "@get('" + basePath + "/management/production-batches/new', '#content')",
+				},
+			}) {
+				Add New Production Batch
+			}
+		</div>
+		if len(productionBatches) == 0 {
+			<div class="text-center py-8">
+				<p class="text-muted-foreground mb-4">No production batches found.</p>
+				@buttonc.Button(buttonc.ButtonArgs{
+					Variant: "default",
+					Attributes: templ.Attributes{
+						"data-on-click": "@get('" + basePath + "/management/production-batches/new', '#content')",
+					},
+				}) {
+					Create Your First Production Batch
+				}
+			</div>
+		} else {
+			<div class="overflow-x-auto">
+				<table class="w-full border-collapse">
+					<thead>
+						<tr class="border-b">
+							<th class="text-left p-2 font-medium">Flock ID</th>
+							<th class="text-left p-2 font-medium">Date Ready</th>
+							<th class="text-left p-2 font-medium">Number in Batch</th>
+							<th class="text-left p-2 font-medium">Weight Estimate</th>
+							<th class="text-left p-2 font-medium">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, batch := range productionBatches {
+							<tr class="border-b hover:bg-muted/50">
+								<td class="p-2">{ strconv.FormatInt(batch.FlockID, 10) }</td>
+								<td class="p-2">
+									if batch.DateReady != nil {
+										{ batch.DateReady.Format("2006-01-02") }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if batch.NumberInBatch != nil {
+										{ strconv.Itoa(*batch.NumberInBatch) }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if batch.WeightEstimate != nil {
+										{ fmt.Sprintf("%.2f", *batch.WeightEstimate) }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									<div class="flex gap-2">
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "outline",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "@get('" + basePath + "/management/production-batches/" + strconv.FormatInt(batch.BatchID, 10) + "', '#content')",
+											},
+										}) {
+											Edit
+										}
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "destructive",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "$confirm('Are you sure you want to delete this production batch?') && @delete('" + basePath + "/management/production-batches/" + strconv.FormatInt(batch.BatchID, 10) + "', {headers: {'X-CSRF-Token': '" + csrf + "'}})",
+											},
+										}) {
+											Delete
+										}
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+	<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<p class="text-muted-foreground">Select a production batch to edit or create a new one.</p>
+	</div>
+}

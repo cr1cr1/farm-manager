@@ -1,0 +1,113 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// StaffContent renders the staff management content
+templ StaffContent(basePath, csrf string, staff []*domain.Staff) {
+	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-2xl font-semibold text-foreground">👥 Staff Management</h2>
+			@buttonc.Button(buttonc.ButtonArgs{
+				Variant: "default",
+				Attributes: templ.Attributes{
+					"data-on-click": "@get('" + basePath + "/management/staff/new', '#content')",
+				},
+			}) {
+				Add New Staff Member
+			}
+		</div>
+		if len(staff) == 0 {
+			<div class="text-center py-8">
+				<p class="text-muted-foreground mb-4">No staff members found.</p>
+				@buttonc.Button(buttonc.ButtonArgs{
+					Variant: "default",
+					Attributes: templ.Attributes{
+						"data-on-click": "@get('" + basePath + "/management/staff/new', '#content')",
+					},
+				}) {
+					Create Your First Staff Member
+				}
+			</div>
+		} else {
+			<div class="overflow-x-auto">
+				<table class="w-full border-collapse">
+					<thead>
+						<tr class="border-b">
+							<th class="text-left p-2 font-medium">Name</th>
+							<th class="text-left p-2 font-medium">Role</th>
+							<th class="text-left p-2 font-medium">Schedule</th>
+							<th class="text-left p-2 font-medium">Contact Info</th>
+							<th class="text-left p-2 font-medium">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, member := range staff {
+							<tr class="border-b hover:bg-muted/50">
+								<td class="p-2">{ member.Name }</td>
+								<td class="p-2">
+									if member.Role != nil {
+										{ *member.Role }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if member.Schedule != nil {
+										{ *member.Schedule }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if member.ContactInfo != nil {
+										{ *member.ContactInfo }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									<div class="flex gap-2">
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "outline",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "@get('" + basePath + "/management/staff/" + strconv.FormatInt(member.StaffID, 10) + "', '#content')",
+											},
+										}) {
+											Edit
+										}
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "destructive",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "$confirm('Are you sure you want to delete this staff member?') && @delete('" + basePath + "/management/staff/" + strconv.FormatInt(member.StaffID, 10) + "', {headers: {'X-CSRF-Token': '" + csrf + "'}})",
+											},
+										}) {
+											Delete
+										}
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+	<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<p class="text-muted-foreground">Select a staff member to edit or create a new one.</p>
+	</div>
+}
+
+// StaffPage renders the staff management page
+templ StaffPage(basePath, csrf, username, userTheme string, staff []*domain.Staff) {
+	@layouts.Root(basePath, "Staff Management", true, csrf, username, userTheme) {
+		@StaffContent(basePath, csrf, staff)
+	}
+}

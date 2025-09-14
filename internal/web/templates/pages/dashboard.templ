@@ -1,33 +1,86 @@
 package pages
 
-import "github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+import (
+	"github.com/cr1cr1/farm-manager/internal/web/models"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
 
 // DashboardContent supplies the dashboard inner content (no layout wrapper).
 // Intended to be passed as children to BaseLayout.
-templ DashboardContent(basePath string, csrf string) {
-	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
-		<div class="mb-4">
-			<h2 class="text-2xl font-semibold text-foreground">Dashboard</h2>
+templ DashboardContent(basePath string, csrf string, counts *models.DashboardCounts) {
+	<div class="space-y-6">
+		<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+			<div class="mb-4">
+				<h2 class="text-2xl font-semibold text-foreground">Farm Management Dashboard</h2>
+				<p class="text-muted-foreground">Overview of your farm operations</p>
+			</div>
+			<!-- Core Farm Assets -->
+			<div class="mb-6">
+				<h3 class="text-lg font-medium mb-4 text-foreground">Core Assets</h3>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+					@DashboardCard("Barns", counts.Barns, "🏭", basePath+"/management/barns", "Manage barn facilities")
+					@DashboardCard("Feed Types", counts.FeedTypes, "🌾", basePath+"/management/feed-types", "Manage feed inventory")
+					@DashboardCard("Staff", counts.Staff, "👥", basePath+"/management/staff", "Manage farm personnel")
+					@DashboardCard("Flocks", counts.Flocks, "🐔", basePath+"/management/flocks", "Manage poultry flocks")
+				</div>
+			</div>
+			<!-- Operations & Records -->
+			<div class="mb-6">
+				<h3 class="text-lg font-medium mb-4 text-foreground">Operations & Records</h3>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+					@DashboardCard("Feeding Records", counts.FeedingRecords, "🍽️", basePath+"/management/feeding-records", "Track feed consumption")
+					@DashboardCard("Health Checks", counts.HealthChecks, "🏥", basePath+"/management/health-checks", "Monitor flock health")
+					@DashboardCard("Mortality Records", counts.MortalityRecords, "⚠️", basePath+"/management/mortality-records", "Track losses")
+					@DashboardCard("Production Batches", counts.ProductionBatches, "🥚", basePath+"/management/production-batches", "Manage egg production")
+				</div>
+			</div>
+			<!-- Processing & Sales -->
+			<div class="mb-6">
+				<h3 class="text-lg font-medium mb-4 text-foreground">Processing & Sales</h3>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+					@DashboardCard("Slaughter Records", counts.SlaughterRecords, "🔪", basePath+"/management/slaughter-records", "Track processing")
+					@DashboardCard("Inventory Items", counts.InventoryItems, "📦", basePath+"/management/inventory-items", "Manage supplies")
+					@DashboardCard("Customers", counts.Customers, "🛒", basePath+"/management/customers", "Manage buyers")
+					@DashboardCard("Orders", counts.Orders, "📋", basePath+"/management/orders", "Track sales orders")
+				</div>
+			</div>
+			<!-- Order Items (if needed separately) -->
+			if counts.OrderItems > 0 {
+				<div class="mb-6">
+					<h3 class="text-lg font-medium mb-4 text-foreground">Order Details</h3>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+						@DashboardCard("Order Items", counts.OrderItems, "📦", basePath+"/management/order-items", "Detailed order items")
+					</div>
+				</div>
+			}
 		</div>
-		<p class="text-muted-foreground mb-4">This is a blank dashboard placeholder.</p>
-		<div class="flex gap-2">
-			<a
-				class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"
-				href={ basePath + "/fragment/ping" }
-				data-on-click="@get(el.getAttribute('href'), '#content'); evt.preventDefault();"
-			>
-				Load Fragment (Ping)
-			</a>
+		<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+			<p class="text-muted-foreground">Select a management area above to get started.</p>
 		</div>
-	</div>
-	<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
-		<p class="text-muted-foreground">Fragment target area.</p>
 	</div>
 }
 
+// DashboardCard renders a clickable card for a management area
+templ DashboardCard(title string, count int64, icon, href, description string) {
+	<a
+		href={ href }
+		data-on-click={ "@get('" + href + "', '#content', {merge: 'morph'}); window.refreshTheme && window.refreshTheme()" }
+		class="block p-4 bg-muted/50 hover:bg-muted border border-border rounded-lg transition-all hover:shadow-md group"
+	>
+		<div class="flex items-center justify-between mb-2">
+			<div class="text-2xl">{ icon }</div>
+			<div class="text-2xl font-bold text-primary">{ count }</div>
+		</div>
+		<div class="space-y-1">
+			<h4 class="font-medium text-foreground group-hover:text-primary transition-colors">{ title }</h4>
+			<p class="text-sm text-muted-foreground">{ description }</p>
+		</div>
+	</a>
+}
+
 // DashboardPage composes the layout + content for initial full-page load.
-templ DashboardPage(basePath, title, csrf, username, userTheme string) {
+templ DashboardPage(basePath, title, csrf, username, userTheme string, counts *models.DashboardCounts) {
 	@layouts.Root(basePath, title, true, csrf, username, userTheme) {
-		@DashboardContent(basePath, csrf)
+		@DashboardContent(basePath, csrf, counts)
 	}
 }

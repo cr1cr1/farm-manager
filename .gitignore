@@ -16,3 +16,4 @@ coverage*
 
 /farm-manager
 __debug_bin*
+/qdrant_storage/

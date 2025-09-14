@@ -1,0 +1,165 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// FeedingRecordContent renders the feeding record edit content
+templ FeedingRecordContent(basePath, csrf string, feedingRecord *domain.FeedingRecord, flocks []*domain.Flock, feedTypes []*domain.FeedType, staff []*domain.Staff) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"flock_id":     "",
+			"feed_type_id": "",
+			"amount_given": "",
+			"date_time":    "",
+			"staff_id":     "",
+		}
+
+		// Pre-populate signals if editing existing feeding record
+		if feedingRecord != nil {
+			initialData["flock_id"] = strconv.FormatInt(feedingRecord.FlockID, 10)
+			initialData["feed_type_id"] = strconv.FormatInt(feedingRecord.FeedTypeID, 10)
+			if feedingRecord.AmountGiven != nil {
+				initialData["amount_given"] = strconv.FormatFloat(*feedingRecord.AmountGiven, 'f', 2, 64)
+			}
+			if feedingRecord.DateTime.Valid {
+				initialData["date_time"] = feedingRecord.DateTime.Time.Format("2006-01-02T15:04")
+			}
+			if feedingRecord.StaffID != nil {
+				initialData["staff_id"] = strconv.FormatInt(*feedingRecord.StaffID, 10)
+			}
+		}
+
+		signals := utilsc.Signals("feeding_record_form", initialData)
+
+		// Compute form action URL
+		actionURL := basePath + "/management/feeding-records"
+		if feedingRecord != nil {
+			actionURL = basePath + "/management/feeding-records/" + strconv.FormatInt(feedingRecord.FeedingRecordID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if feedingRecord == nil {
+					Create New Feeding Record
+				} else {
+					Edit Feeding Record: { strconv.FormatInt(feedingRecord.FeedingRecordID, 10) }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "feeding_record_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if feedingRecord != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "flock_id",
+					}) {
+						Flock *
+					}
+					<select id="flock_id" name="flock_id" form="feeding_record_form" required data-bind="feeding_record_form.flock_id">
+						<option value="">Select Flock</option>
+						for _, flock := range flocks {
+							<option value={ strconv.FormatInt(flock.FlockID, 10) }>{ flock.Breed }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "feed_type_id",
+					}) {
+						Feed Type *
+					}
+					<select id="feed_type_id" name="feed_type_id" form="feeding_record_form" required data-bind="feeding_record_form.feed_type_id">
+						<option value="">Select Feed Type</option>
+						for _, feedType := range feedTypes {
+							<option value={ strconv.FormatInt(feedType.FeedTypeID, 10) }>{ feedType.Name }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "amount_given",
+					}) {
+						Amount Given
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "amount_given",
+						Name:   "amount_given",
+						FormID: "feeding_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter amount given (optional)",
+							"step":        "0.01",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "date_time",
+					}) {
+						Date Time
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "datetime-local",
+						ID:     "date_time",
+						Name:   "date_time",
+						FormID: "feeding_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Select date and time (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "staff_id",
+					}) {
+						Staff
+					}
+					<select id="staff_id" name="staff_id" form="feeding_record_form" data-bind="feeding_record_form.staff_id">
+						<option value="">Select Staff (optional)</option>
+						for _, s := range staff {
+							<option value={ strconv.FormatInt(s.StaffID, 10) }>{ s.Name }</option>
+						}
+					</select>
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Save
+				}
+			</div>
+		}
+	</div>
+}
+
+// FeedingRecordPage renders the feeding record edit page
+templ FeedingRecordPage(basePath, csrf, username, userTheme string, feedingRecord *domain.FeedingRecord, flocks []*domain.Flock, feedTypes []*domain.FeedType, staff []*domain.Staff) {
+	@layouts.Root(basePath, "Feeding Record", true, csrf, username, userTheme) {
+		@FeedingRecordContent(basePath, csrf, feedingRecord, flocks, feedTypes, staff)
+	}
+}

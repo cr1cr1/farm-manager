@@ -1,0 +1,234 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// FlockContent renders the flock edit content
+templ FlockContent(basePath, csrf string, flock *domain.Flock, barns []*domain.Barn, feedTypes []*domain.FeedType) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"breed":           "",
+			"hatch_date":      "",
+			"number_of_birds": "",
+			"current_age":     "",
+			"barn_id":         "",
+			"health_status":   "",
+			"feed_type_id":    "",
+			"notes":           "",
+		}
+
+		// Pre-populate signals if editing existing flock
+		if flock != nil {
+			initialData["breed"] = flock.Breed
+			if flock.HatchDate != nil {
+				initialData["hatch_date"] = flock.HatchDate.Format("2006-01-02")
+			}
+			if flock.NumberOfBirds != nil {
+				initialData["number_of_birds"] = strconv.Itoa(*flock.NumberOfBirds)
+			}
+			if flock.CurrentAge != nil {
+				initialData["current_age"] = strconv.Itoa(*flock.CurrentAge)
+			}
+			if flock.BarnID != nil {
+				initialData["barn_id"] = strconv.FormatInt(*flock.BarnID, 10)
+			}
+			if flock.HealthStatus != nil {
+				initialData["health_status"] = *flock.HealthStatus
+			}
+			if flock.FeedTypeID != nil {
+				initialData["feed_type_id"] = strconv.FormatInt(*flock.FeedTypeID, 10)
+			}
+			if flock.Notes != nil {
+				initialData["notes"] = *flock.Notes
+			}
+		}
+
+		signals := utilsc.Signals("flock_form", initialData)
+
+		// Compute form action URL
+		actionURL := basePath + "/management/flocks"
+
+		if flock != nil {
+			actionURL = basePath + "/management/flocks/" + strconv.FormatInt(flock.FlockID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if flock == nil {
+					Create New Flock
+				} else {
+					Edit Flock: { flock.Breed }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "flock_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if flock != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "breed",
+					}) {
+						Breed *
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:     "text",
+						ID:       "breed",
+						Name:     "breed",
+						FormID:   "flock_form",
+						Required: true,
+						Attributes: templ.Attributes{
+							"placeholder": "Enter breed",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "hatch_date",
+					}) {
+						Hatch Date
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "date",
+						ID:     "hatch_date",
+						Name:   "hatch_date",
+						FormID: "flock_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Select hatch date (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "number_of_birds",
+					}) {
+						Number of Birds
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "number_of_birds",
+						Name:   "number_of_birds",
+						FormID: "flock_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter number of birds (optional)",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "current_age",
+					}) {
+						Current Age
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "current_age",
+						Name:   "current_age",
+						FormID: "flock_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter current age in days (optional)",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "barn_id",
+					}) {
+						Barn
+					}
+					<select id="barn_id" name="barn_id" form="flock_form" data-bind="flock_form.barn_id">
+						<option value="">Select Barn (optional)</option>
+						for _, barn := range barns {
+							<option value={ strconv.FormatInt(barn.BarnID, 10) }>{ barn.Name }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "health_status",
+					}) {
+						Health Status
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "health_status",
+						Name:   "health_status",
+						FormID: "flock_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter health status (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "feed_type_id",
+					}) {
+						Feed Type
+					}
+					<select id="feed_type_id" name="feed_type_id" form="flock_form" data-bind="flock_form.feed_type_id">
+						<option value="">Select Feed Type (optional)</option>
+						for _, feedType := range feedTypes {
+							<option value={ strconv.FormatInt(feedType.FeedTypeID, 10) }>{ feedType.Name }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{
+					Class: "md:col-span-2",
+				}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "notes",
+					}) {
+						Notes
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "notes",
+						Name:   "notes",
+						FormID: "flock_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter notes (optional)",
+						},
+					})
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Save
+				}
+			</div>
+		}
+	</div>
+}
+
+// FlockPage renders the flock edit page
+templ FlockPage(basePath, csrf, username, userTheme string, flock *domain.Flock, barns []*domain.Barn, feedTypes []*domain.FeedType) {
+	@layouts.Root(basePath, "Flock", true, csrf, username, userTheme) {
+		@FlockContent(basePath, csrf, flock, barns, feedTypes)
+	}
+}

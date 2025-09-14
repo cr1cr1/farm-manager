@@ -1,0 +1,177 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// OrderItemContent renders the order item edit content
+templ OrderItemContent(basePath, csrf string, orderItem *domain.OrderItem, orders []*domain.Order) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"order_id":            "",
+			"product_description": "",
+			"quantity":            "",
+			"unit_price":          "",
+			"total_price":         "",
+		}
+
+		// Pre-populate signals if editing existing order item
+		if orderItem != nil {
+			initialData["order_id"] = strconv.FormatInt(orderItem.OrderID, 10)
+			if orderItem.ProductDescription != nil {
+				initialData["product_description"] = *orderItem.ProductDescription
+			}
+			if orderItem.Quantity != nil {
+				initialData["quantity"] = strconv.FormatFloat(*orderItem.Quantity, 'f', 2, 64)
+			}
+			if orderItem.UnitPrice != nil {
+				initialData["unit_price"] = strconv.FormatFloat(*orderItem.UnitPrice, 'f', 2, 64)
+			}
+			if orderItem.TotalPrice != nil {
+				initialData["total_price"] = strconv.FormatFloat(*orderItem.TotalPrice, 'f', 2, 64)
+			}
+		}
+
+		signals := utilsc.Signals("order_item_form", initialData)
+
+		// Compute form action URL
+		actionURL := basePath + "/management/order-items"
+		if orderItem != nil {
+			actionURL = basePath + "/management/order-items/" + strconv.FormatInt(orderItem.OrderItemID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if orderItem == nil {
+					Create New Order Item
+				} else {
+					Edit Order Item: { strconv.FormatInt(orderItem.OrderItemID, 10) }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "order_item_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if orderItem != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "order_id",
+					}) {
+						Order *
+					}
+					<select id="order_id" name="order_id" form="order_item_form" required data-signals="order_item_form" data-bind="order_item_form.order_id">
+						<option value="">Select Order</option>
+						for _, order := range orders {
+							<option value={ strconv.FormatInt(order.OrderID, 10) }>{ strconv.FormatInt(order.OrderID, 10) }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "product_description",
+					}) {
+						Product Description
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "product_description",
+						Name:   "product_description",
+						FormID: "order_item_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter product description (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "quantity",
+					}) {
+						Quantity
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "quantity",
+						Name:   "quantity",
+						FormID: "order_item_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter quantity (optional)",
+							"step":        "0.01",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "unit_price",
+					}) {
+						Unit Price
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "unit_price",
+						Name:   "unit_price",
+						FormID: "order_item_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter unit price (optional)",
+							"step":        "0.01",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "total_price",
+					}) {
+						Total Price
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "total_price",
+						Name:   "total_price",
+						FormID: "order_item_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter total price (optional)",
+							"step":        "0.01",
+							"min":         "0",
+						},
+					})
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Save
+				}
+			</div>
+		}
+	</div>
+}
+
+// OrderItemPage renders the order item edit page
+templ OrderItemPage(basePath, csrf, username, userTheme string, orderItem *domain.OrderItem, orders []*domain.Order) {
+	@layouts.Root(basePath, "Order Item Management", true, csrf, username, userTheme) {
+		@OrderItemContent(basePath, csrf, orderItem, orders)
+	}
+}

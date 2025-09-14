@@ -1,0 +1,174 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// MortalityRecordPage renders the mortality record edit page
+templ MortalityRecordPage(basePath, csrf, userTheme string, mortalityRecord *domain.MortalityRecord, flocks []*domain.Flock) {
+	@layouts.Root(basePath, "Mortality Record Management", true, csrf, "", userTheme) {
+		@MortalityRecordContent(basePath, csrf, mortalityRecord, flocks)
+	}
+}
+
+// MortalityRecordContent renders the mortality record content for DataStar fragments
+templ MortalityRecordContent(basePath, csrf string, mortalityRecord *domain.MortalityRecord, flocks []*domain.Flock) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"flock_id":       "",
+			"date":           "",
+			"number_dead":    "",
+			"cause_of_death": "",
+			"notes":          "",
+		}
+
+		// Pre-populate signals if editing existing mortality record
+		if mortalityRecord != nil {
+			initialData["flock_id"] = strconv.FormatInt(mortalityRecord.FlockID, 10)
+			if mortalityRecord.Date != nil {
+				initialData["date"] = mortalityRecord.Date.Format("2006-01-02")
+			}
+			if mortalityRecord.NumberDead != nil {
+				initialData["number_dead"] = strconv.Itoa(*mortalityRecord.NumberDead)
+			}
+			if mortalityRecord.CauseOfDeath != nil {
+				initialData["cause_of_death"] = *mortalityRecord.CauseOfDeath
+			}
+			if mortalityRecord.Notes != nil {
+				initialData["notes"] = *mortalityRecord.Notes
+			}
+		}
+
+		signals := utilsc.Signals("mortality_record_form", initialData)
+
+		actionURL := basePath + "/management/mortality-records"
+
+		if mortalityRecord != nil {
+			actionURL = basePath + "/management/mortality-records/" + strconv.FormatInt(mortalityRecord.MortalityRecordID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if mortalityRecord == nil {
+					Create New Mortality Record
+				} else {
+					Edit Mortality Record: { strconv.FormatInt(mortalityRecord.MortalityRecordID, 10) }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "mortality_record_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if mortalityRecord != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "flock_id",
+					}) {
+						Flock *
+					}
+					<select id="flock_id" name="flock_id" form="mortality_record_form" required data-bind="mortality_record_form.flock_id">
+						<option value="">Select Flock</option>
+						for _, flock := range flocks {
+							<option value={ strconv.FormatInt(flock.FlockID, 10) }>{ flock.Breed }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "date",
+					}) {
+						Date
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "date",
+						ID:     "date",
+						Name:   "date",
+						FormID: "mortality_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Select date (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "number_dead",
+					}) {
+						Number Dead
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "number_dead",
+						Name:   "number_dead",
+						FormID: "mortality_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter number dead (optional)",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "cause_of_death",
+					}) {
+						Cause of Death
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "cause_of_death",
+						Name:   "cause_of_death",
+						FormID: "mortality_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter cause of death (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{
+					Class: "md:col-span-2",
+				}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "notes",
+					}) {
+						Notes
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "notes",
+						Name:   "notes",
+						FormID: "mortality_record_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter notes (optional)",
+						},
+					})
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Submit
+				}
+			</div>
+		}
+	</div>
+}

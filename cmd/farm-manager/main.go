@@ -42,6 +42,19 @@ func main() {
 
 	// Repositories.
 	userRepo := data.NewSQLiteUserRepo(db)
+	barnRepo := &data.SQLiteBarnRepo{DB: db}
+	feedTypeRepo := &data.SQLiteFeedTypeRepo{DB: db}
+	staffRepo := &data.SQLiteStaffRepo{DB: db}
+	flockRepo := &data.SQLiteFlockRepo{DB: db}
+	feedingRecordRepo := &data.SQLiteFeedingRecordRepo{DB: db}
+	healthCheckRepo := &data.SQLiteHealthCheckRepo{DB: db}
+	mortalityRecordRepo := &data.SQLiteMortalityRecordRepo{DB: db}
+	productionBatchRepo := &data.SQLiteProductionBatchRepo{DB: db}
+	slaughterRecordRepo := &data.SQLiteSlaughterRecordRepo{DB: db}
+	inventoryItemRepo := &data.SQLiteInventoryItemRepo{DB: db}
+	customerRepo := &data.SQLiteCustomerRepo{DB: db}
+	orderRepo := &data.SQLiteOrderRepo{DB: db}
+	orderItemRepo := &data.SQLiteOrderItemRepo{DB: db}
 
 	// Server.
 	s := g.Server()
@@ -86,8 +99,42 @@ func main() {
 	// Protected routes (dashboard and fragments).
 	protected := s.Group(base)
 	protected.Middleware(middleware.Csrf(), middleware.RequireAuth())
-	handlers.RegisterDashboardRoutes(protected, userRepo)
+
+	// Create dashboard repos struct with all repositories
+	dashboardRepos := &handlers.DashboardRepos{
+		UserRepo:            userRepo,
+		BarnRepo:            barnRepo,
+		FeedTypeRepo:        feedTypeRepo,
+		StaffRepo:           staffRepo,
+		FlockRepo:           flockRepo,
+		FeedingRecordRepo:   feedingRecordRepo,
+		HealthCheckRepo:     healthCheckRepo,
+		MortalityRecordRepo: mortalityRecordRepo,
+		ProductionBatchRepo: productionBatchRepo,
+		SlaughterRecordRepo: slaughterRecordRepo,
+		InventoryItemRepo:   inventoryItemRepo,
+		CustomerRepo:        customerRepo,
+		OrderRepo:           orderRepo,
+		OrderItemRepo:       orderItemRepo,
+	}
+
+	handlers.RegisterDashboardRoutes(protected, dashboardRepos)
 	handlers.RegisterProfileRoutes(protected, userRepo)
+
+	// Register individual domain management routes
+	handlers.RegisterBarnRoutes(protected, barnRepo)
+	handlers.RegisterFeedTypeRoutes(protected, feedTypeRepo)
+	handlers.RegisterStaffRoutes(protected, staffRepo)
+	handlers.RegisterFlockRoutes(protected, flockRepo, barnRepo, feedTypeRepo)
+	handlers.RegisterFeedingRecordRoutes(protected, feedingRecordRepo, flockRepo, feedTypeRepo, staffRepo)
+	handlers.RegisterHealthCheckRoutes(protected, healthCheckRepo, flockRepo, staffRepo)
+	handlers.RegisterInventoryItemRoutes(protected, inventoryItemRepo)
+	handlers.RegisterMortalityRecordRoutes(protected, mortalityRecordRepo, flockRepo)
+	handlers.RegisterProductionBatchRoutes(protected, productionBatchRepo, flockRepo, staffRepo)
+	handlers.RegisterSlaughterRecordRoutes(protected, slaughterRecordRepo, productionBatchRepo, staffRepo)
+	handlers.RegisterCustomerRoutes(protected, customerRepo)
+	handlers.RegisterOrderRoutes(protected, orderRepo, customerRepo)
+	handlers.RegisterOrderItemRoutes(protected, orderItemRepo, orderRepo)
 
 	s.Run()
 }

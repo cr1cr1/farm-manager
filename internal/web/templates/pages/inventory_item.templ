@@ -1,0 +1,220 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// InventoryItemPage renders the inventory item edit page
+templ InventoryItemPage(basePath, csrf, userTheme string, inventoryItem *domain.InventoryItem) {
+	@layouts.Root(basePath, "Inventory Item Management", true, csrf, "", userTheme) {
+		@InventoryItemContent(basePath, csrf, inventoryItem)
+	}
+}
+
+// InventoryItemContent renders the inventory item content for DataStar fragments
+templ InventoryItemContent(basePath, csrf string, inventoryItem *domain.InventoryItem) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"item":            "",
+			"type":            "",
+			"quantity":        "",
+			"unit":            "",
+			"expiration_date": "",
+			"supplier_info":   "",
+			"notes":           "",
+		}
+
+		// Pre-populate signals if editing existing inventory item
+		if inventoryItem != nil {
+			initialData["item"] = inventoryItem.Name
+			if inventoryItem.Type != nil {
+				initialData["type"] = *inventoryItem.Type
+			}
+			if inventoryItem.Quantity != nil {
+				initialData["quantity"] = strconv.FormatFloat(*inventoryItem.Quantity, 'f', 2, 64)
+			}
+			if inventoryItem.Unit != nil {
+				initialData["unit"] = *inventoryItem.Unit
+			}
+			if inventoryItem.ExpirationDate != nil {
+				initialData["expiration_date"] = inventoryItem.ExpirationDate.Format("2006-01-02")
+			}
+			if inventoryItem.SupplierInfo != nil {
+				initialData["supplier_info"] = *inventoryItem.SupplierInfo
+			}
+			if inventoryItem.Notes != nil {
+				initialData["notes"] = *inventoryItem.Notes
+			}
+		}
+
+		signals := utilsc.Signals("inventory_item_form", initialData)
+
+		// Compute form action URL
+		actionURL := basePath + "/management/inventory-items"
+		if inventoryItem != nil {
+			actionURL = basePath + "/management/inventory-items/" + strconv.FormatInt(inventoryItem.InventoryItemID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals }>
+		<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+			<div class="mb-4">
+				<h3 class="text-lg font-semibold text-foreground">
+					if inventoryItem == nil {
+						Create New Inventory Item
+					} else {
+						Edit Inventory Item: { inventoryItem.Name }
+					}
+				</h3>
+			</div>
+			@formc.Form(formc.FormArgs{
+				ID:     "inventory_item_form",
+				Action: actionURL,
+				Attributes: templ.Attributes{
+					"data-target":  "#content",
+					"autocomplete": "off",
+				},
+			}) {
+				<input type="hidden" name="csrf_token" value={ csrf }/>
+				if inventoryItem != nil {
+					<input type="hidden" name="_method" value="PUT"/>
+				}
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "name",
+						}) {
+							Name *
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:     "text",
+							ID:       "item",
+							Name:     "item",
+							FormID:   "inventory_item_form",
+							Required: true,
+							Attributes: templ.Attributes{
+								"placeholder": "Enter item name",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "type",
+						}) {
+							Type
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "text",
+							ID:     "type",
+							Name:   "type",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Enter item type (optional)",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "quantity",
+						}) {
+							Quantity
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "number",
+							ID:     "quantity",
+							Name:   "quantity",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Enter quantity (optional)",
+								"step":        "0.01",
+								"min":         "0",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "unit",
+						}) {
+							Unit
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "text",
+							ID:     "unit",
+							Name:   "unit",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Enter unit (optional)",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "expiration_date",
+						}) {
+							Expiration Date
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "date",
+							ID:     "expiration_date",
+							Name:   "expiration_date",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Select expiration date (optional)",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "supplier_info",
+						}) {
+							Supplier Info
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "text",
+							ID:     "supplier_info",
+							Name:   "supplier_info",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Enter supplier information (optional)",
+							},
+						})
+					}
+					@form.FormItem(form.FormItemArgs{
+						Class: "md:col-span-2",
+					}) {
+						@formc.FormLabel(formc.FormLabelArgs{
+							For: "notes",
+						}) {
+							Notes
+						}
+						@inputc.Input(inputc.InputArgs{
+							Type:   "text",
+							ID:     "notes",
+							Name:   "notes",
+							FormID: "inventory_item_form",
+							Attributes: templ.Attributes{
+								"placeholder": "Enter notes (optional)",
+							},
+						})
+					}
+				</div>
+				<div class="flex gap-2 mt-6">
+					@buttonc.Button(buttonc.ButtonArgs{
+						Type:    "submit",
+						Variant: "default",
+					}) {
+						Submit
+					}
+				</div>
+			}
+		</div>
+	</div>
+}

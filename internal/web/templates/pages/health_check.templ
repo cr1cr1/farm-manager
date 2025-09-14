@@ -1,0 +1,210 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// HealthCheckContent renders the health check edit content
+templ HealthCheckContent(basePath, csrf string, healthCheck *domain.HealthCheck, flocks []*domain.Flock, staff []*domain.Staff) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"flock_id":                "",
+			"check_date":              "",
+			"health_status":           "",
+			"vaccinations_given":      "",
+			"treatments_administered": "",
+			"notes":                   "",
+			"staff_id":                "",
+		}
+
+		// Pre-populate signals if editing existing health check
+		if healthCheck != nil {
+			initialData["flock_id"] = strconv.FormatInt(healthCheck.FlockID, 10)
+			if healthCheck.CheckDate != nil {
+				initialData["check_date"] = healthCheck.CheckDate.Format("2006-01-02")
+			}
+			if healthCheck.HealthStatus != nil {
+				initialData["health_status"] = *healthCheck.HealthStatus
+			}
+			if healthCheck.VaccinationsGiven != nil {
+				initialData["vaccinations_given"] = *healthCheck.VaccinationsGiven
+			}
+			if healthCheck.TreatmentsAdministered != nil {
+				initialData["treatments_administered"] = *healthCheck.TreatmentsAdministered
+			}
+			if healthCheck.Notes != nil {
+				initialData["notes"] = *healthCheck.Notes
+			}
+			if healthCheck.StaffID != nil {
+				initialData["staff_id"] = strconv.FormatInt(*healthCheck.StaffID, 10)
+			}
+		}
+
+		signals := utilsc.Signals("health_check_form", initialData)
+
+		// Compute form action URL
+		actionURL := basePath + "/management/health-checks"
+		if healthCheck != nil {
+			actionURL = basePath + "/management/health-checks/" + strconv.FormatInt(healthCheck.HealthCheckID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if healthCheck == nil {
+					Create New Health Check
+				} else {
+					Edit Health Check: { strconv.FormatInt(healthCheck.HealthCheckID, 10) }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "health_check_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if healthCheck != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "flock_id",
+					}) {
+						Flock *
+					}
+					<select id="flock_id" name="flock_id" form="health_check_form" required data-signals="health_check_form" data-bind="health_check_form.flock_id">
+						<option value="">Select Flock</option>
+						for _, flock := range flocks {
+							<option value={ strconv.FormatInt(flock.FlockID, 10) }>{ flock.Breed }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "check_date",
+					}) {
+						Check Date
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "date",
+						ID:     "check_date",
+						Name:   "check_date",
+						FormID: "health_check_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Select check date (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "health_status",
+					}) {
+						Health Status
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "health_status",
+						Name:   "health_status",
+						FormID: "health_check_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter health status (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "vaccinations_given",
+					}) {
+						Vaccinations Given
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "vaccinations_given",
+						Name:   "vaccinations_given",
+						FormID: "health_check_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter vaccinations given (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "treatments_administered",
+					}) {
+						Treatments Administered
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "treatments_administered",
+						Name:   "treatments_administered",
+						FormID: "health_check_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter treatments administered (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "staff_id",
+					}) {
+						Staff
+					}
+					<select id="staff_id" name="staff_id" form="health_check_form" data-signals="health_check_form" data-bind="health_check_form.staff_id">
+						<option value="">Select Staff (optional)</option>
+						for _, s := range staff {
+							<option value={ strconv.FormatInt(s.StaffID, 10) }>{ s.Name }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{
+					Class: "md:col-span-2",
+				}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "notes",
+					}) {
+						Notes
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "notes",
+						Name:   "notes",
+						FormID: "health_check_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter notes (optional)",
+						},
+					})
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Save
+				}
+			</div>
+		}
+	</div>
+}
+
+// HealthCheckPage renders the health check edit page
+templ HealthCheckPage(basePath, csrf, username, userTheme string, healthCheck *domain.HealthCheck, flocks []*domain.Flock, staff []*domain.Staff) {
+	@layouts.Root(basePath, "Health Check", true, csrf, username, userTheme) {
+		@HealthCheckContent(basePath, csrf, healthCheck, flocks, staff)
+	}
+}

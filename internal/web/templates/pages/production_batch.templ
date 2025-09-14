@@ -1,0 +1,176 @@
+package pages
+
+import (
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	formc "github.com/coreycole/datastarui/components/form"
+	inputc "github.com/coreycole/datastarui/components/input"
+	utilsc "github.com/coreycole/datastarui/utils"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/components/form"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// ProductionBatchPage renders the production batch edit page
+templ ProductionBatchPage(basePath, csrf, userTheme string, productionBatch *domain.ProductionBatch, flocks []*domain.Flock, staff []*domain.Staff) {
+	@layouts.Root(basePath, "Production Batch Management", true, csrf, "", userTheme) {
+		@ProductionBatchContent(basePath, csrf, productionBatch, flocks, staff)
+	}
+}
+
+// ProductionBatchContent renders the production batch content for DataStar fragments
+templ ProductionBatchContent(basePath, csrf string, productionBatch *domain.ProductionBatch, flocks []*domain.Flock, staff []*domain.Staff) {
+	{{
+		// Set up form signals with initial values
+		initialData := map[string]interface{}{
+			"flock_id":        "",
+			"date_ready":      "",
+			"number_in_batch": "",
+			"weight_estimate": "",
+			"notes":           "",
+		}
+
+		// Pre-populate signals if editing existing production batch
+		if productionBatch != nil {
+			initialData["flock_id"] = strconv.FormatInt(productionBatch.FlockID, 10)
+			if productionBatch.DateReady != nil {
+				initialData["date_ready"] = productionBatch.DateReady.Format("2006-01-02")
+			}
+			if productionBatch.NumberInBatch != nil {
+				initialData["number_in_batch"] = strconv.Itoa(*productionBatch.NumberInBatch)
+			}
+			if productionBatch.WeightEstimate != nil {
+				initialData["weight_estimate"] = strconv.FormatFloat(*productionBatch.WeightEstimate, 'f', 2, 64)
+			}
+			if productionBatch.Notes != nil {
+				initialData["notes"] = *productionBatch.Notes
+			}
+		}
+
+		signals := utilsc.Signals("production_batch_form", initialData)
+
+		actionURL := basePath + "/management/production-batches"
+
+		if productionBatch != nil {
+			actionURL = basePath + "/management/production-batches/" + strconv.FormatInt(productionBatch.BatchID, 10)
+		}
+	}}
+	<div id="content" data-signals={ signals.DataSignals } class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<div class="mb-4">
+			<h3 class="text-lg font-semibold text-foreground">
+				if productionBatch == nil {
+					Create New Production Batch
+				} else {
+					Edit Production Batch: { strconv.FormatInt(productionBatch.BatchID, 10) }
+				}
+			</h3>
+		</div>
+		@formc.Form(formc.FormArgs{
+			ID: "production_batch_form",
+			Attributes: templ.Attributes{
+				"data-target":  "#content",
+				"autocomplete": "off",
+			},
+		
+			Action: actionURL,
+		}) {
+			<input type="hidden" name="csrf_token" value={ csrf }/>
+			if productionBatch != nil {
+				<input type="hidden" name="_method" value="PUT"/>
+			}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "flock_id",
+					}) {
+						Flock *
+					}
+					<select id="flock_id" name="flock_id" form="production_batch_form" required data-bind="production_batch_form.flock_id">
+						<option value="">Select Flock</option>
+						for _, flock := range flocks {
+							<option value={ strconv.FormatInt(flock.FlockID, 10) }>{ flock.Breed }</option>
+						}
+					</select>
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "date_ready",
+					}) {
+						Date Ready
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "date",
+						ID:     "date_ready",
+						Name:   "date_ready",
+						FormID: "production_batch_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Select date ready (optional)",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "number_in_batch",
+					}) {
+						Number in Batch
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "number_in_batch",
+						Name:   "number_in_batch",
+						FormID: "production_batch_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter number in batch (optional)",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "weight_estimate",
+					}) {
+						Weight Estimate
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "number",
+						ID:     "weight_estimate",
+						Name:   "weight_estimate",
+						FormID: "production_batch_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter weight estimate (optional)",
+							"step":        "0.01",
+							"min":         "0",
+						},
+					})
+				}
+				@form.FormItem(form.FormItemArgs{
+					Class: "md:col-span-2",
+				}) {
+					@formc.FormLabel(formc.FormLabelArgs{
+						For: "notes",
+					}) {
+						Notes
+					}
+					@inputc.Input(inputc.InputArgs{
+						Type:   "text",
+						ID:     "notes",
+						Name:   "notes",
+						FormID: "production_batch_form",
+						Attributes: templ.Attributes{
+							"placeholder": "Enter notes (optional)",
+						},
+					})
+				}
+			</div>
+			<div class="flex gap-2 mt-6">
+				@buttonc.Button(buttonc.ButtonArgs{
+					Type:    "submit",
+					Variant: "default",
+				}) {
+					Submit
+				}
+			</div>
+		}
+	</div>
+}

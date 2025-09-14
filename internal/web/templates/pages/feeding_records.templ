@@ -1,0 +1,116 @@
+package pages
+
+import (
+	"fmt"
+	"strconv"
+
+	buttonc "github.com/coreycole/datastarui/components/button"
+	"github.com/cr1cr1/farm-manager/internal/domain"
+	"github.com/cr1cr1/farm-manager/internal/web/templates/layouts"
+)
+
+// FeedingRecordsContent renders the feeding records management content
+templ FeedingRecordsContent(basePath, csrf string, feedingRecords []*domain.FeedingRecord) {
+	<div class="bg-card text-card-foreground rounded-xl border shadow-sm p-6 mb-6">
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-2xl font-semibold text-foreground">🍽️ Feeding Record Management</h2>
+			@buttonc.Button(buttonc.ButtonArgs{
+				Variant: "default",
+				Attributes: templ.Attributes{
+					"data-on-click": "@get('" + basePath + "/management/feeding-records/new', '#content')",
+				},
+			}) {
+				Add New Feeding Record
+			}
+		</div>
+		if len(feedingRecords) == 0 {
+			<div class="text-center py-8">
+				<p class="text-muted-foreground mb-4">No feeding records found.</p>
+				@buttonc.Button(buttonc.ButtonArgs{
+					Variant: "default",
+					Attributes: templ.Attributes{
+						"data-on-click": "@get('" + basePath + "/management/feeding-records/new', '#content')",
+					},
+				}) {
+					Create Your First Feeding Record
+				}
+			</div>
+		} else {
+			<div class="overflow-x-auto">
+				<table class="w-full border-collapse">
+					<thead>
+						<tr class="border-b">
+							<th class="text-left p-2 font-medium">Flock ID</th>
+							<th class="text-left p-2 font-medium">Feed Type ID</th>
+							<th class="text-left p-2 font-medium">Amount Given</th>
+							<th class="text-left p-2 font-medium">Date Time</th>
+							<th class="text-left p-2 font-medium">Staff ID</th>
+							<th class="text-left p-2 font-medium">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, record := range feedingRecords {
+							<tr class="border-b hover:bg-muted/50">
+								<td class="p-2">{ strconv.FormatInt(record.FlockID, 10) }</td>
+								<td class="p-2">{ strconv.FormatInt(record.FeedTypeID, 10) }</td>
+								<td class="p-2">
+									if record.AmountGiven != nil {
+										{ fmt.Sprintf("%.2f", *record.AmountGiven) }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if record.DateTime.Valid {
+										{ record.DateTime.Time.Format("2006-01-02 15:04") }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									if record.StaffID != nil {
+										{ strconv.FormatInt(*record.StaffID, 10) }
+									} else {
+										<span class="text-muted-foreground">-</span>
+									}
+								</td>
+								<td class="p-2">
+									<div class="flex gap-2">
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "outline",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "@get('" + basePath + "/management/feeding-records/" + strconv.FormatInt(record.FeedingRecordID, 10) + "', '#content')",
+											},
+										}) {
+											Edit
+										}
+										@buttonc.Button(buttonc.ButtonArgs{
+											Variant: "destructive",
+											Size:    "sm",
+											Attributes: templ.Attributes{
+												"data-on-click": "$confirm('Are you sure you want to delete this feeding record?') && @delete('" + basePath + "/management/feeding-records/" + strconv.FormatInt(record.FeedingRecordID, 10) + "', {headers: {'X-CSRF-Token': '" + csrf + "'}})",
+											},
+										}) {
+											Delete
+										}
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+	<div id="content" class="bg-card text-card-foreground rounded-xl border shadow-sm p-6">
+		<p class="text-muted-foreground">Select a feeding record to edit or create a new one.</p>
+	</div>
+}
+
+// FeedingRecordsPage renders the feeding records management page
+templ FeedingRecordsPage(basePath, csrf, username, userTheme string, feedingRecords []*domain.FeedingRecord) {
+	@layouts.Root(basePath, "Feeding Record Management", true, csrf, username, userTheme) {
+		@FeedingRecordsContent(basePath, csrf, feedingRecords)
+	}
+}
